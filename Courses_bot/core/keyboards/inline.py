@@ -26,7 +26,7 @@ def get_position_kb():
     
     # builder.button(text="", callback_data="User_position")
     
-    builder.adjust(2, 2, 2, 2, 2)
+    builder.adjust(1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
     
     return builder.as_markup()
 
@@ -70,7 +70,7 @@ def get_niche_kb():
     builder.button(text="Логистика", callback_data="Логистика")
     builder.button(text="Сельское хозяйство", callback_data="Сельское хозяйство")
 
-    builder.adjust(2, 3, 2)
+    builder.adjust(1, 1, 1, 1, 1, 1, 1)
     
     return builder.as_markup()
 
@@ -204,7 +204,30 @@ def get_about_kb():
     builder.button(text="Как работать с фреймворками", callback_data="Как работать с фреймворками")
     builder.button(text="Как применять знания на практике", callback_data="Как применять знания на практике")
     builder.button(text="Как проводить рефлексию", callback_data="Как проводить рефлексию")
+    builder.button(text="Меню", callback_data="menu")
 
-    builder.adjust(1,1,1,1)
+    builder.adjust(1,1,1,1,1)
+    
+    return builder.as_markup()
+
+def get_choice_course_kb():
+    builder = InlineKeyboardBuilder()
+
+    builder.button(text="Продолжить", callback_data="Продолжить")
+    builder.button(text="Выбрать", callback_data="Выбрать")
+
+
+    builder.adjust(1,1)
+    
+    return builder.as_markup()
+
+def get_this_lesson_kb():
+    builder = InlineKeyboardBuilder()
+
+    builder.button(text="Да", callback_data="Да")
+    builder.button(text="Меню", callback_data="menu")
+
+
+    builder.adjust(2)
     
     return builder.as_markup()

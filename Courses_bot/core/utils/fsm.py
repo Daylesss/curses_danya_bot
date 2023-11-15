@@ -31,3 +31,6 @@ class BaseFSM(StatesGroup):
     ABOUT = State()
     NEW =State()
     SUPPORT = State()
+    COURSES = State()
+    CHOICE_COURSES =State()
+    THIS_COURSE = State()
