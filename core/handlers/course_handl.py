@@ -36,6 +36,7 @@ async def reset_diag(callback: types.CallbackQuery, state: FSMContext):
 
 @course_router.callback_query(CourseFSM.PLAN)
 async def start_course(callback: types.CallbackQuery, state: FSMContext):
+    await state.set_state(CourseFSM.LECTURE)
     try:
         day = db.get_day(callback.from_user.id)
         lesson = db.get_plan(db.get_plan_id(db.get_user_id(callback.from_user.id)))
@@ -44,7 +45,6 @@ async def start_course(callback: types.CallbackQuery, state: FSMContext):
 
         lecture = await get_lecture_gpt(lesson, diag)
         # lecture = "лекция"
-        await state.set_state(CourseFSM.LECTURE)
         await state.update_data(context = lecture)
         await callback.message.answer(lecture, reply_markup=inline.get_lecture_kb())
         db.update_day_status(db.get_latest_course(db.get_user_id(callback.from_user.id)), "lecture")
@@ -123,8 +123,8 @@ async def feedback_frameworks(message: types.Message, state: FSMContext):
 @course_router.callback_query(CourseFSM.BEFORE_ADVICES)
 async def advices_answer(callback: types.CallbackQuery, state: FSMContext):
     if is_subscribed(1):
+        await state.set_state(CourseFSM.ADVICES)
         try:
-            await state.set_state(CourseFSM.ADVICES)
             day = db.get_day(callback.from_user.id)
             lesson = db.get_plan(db.get_plan_id(db.get_user_id(callback.from_user.id)))
             lesson = json.loads(lesson)["data"][day]
@@ -150,11 +150,11 @@ async def advices_answer(callback: types.CallbackQuery, state: FSMContext):
 @course_router.callback_query(CourseFSM.ADVICES)
 async def exercises(callback: types.CallbackQuery, state: FSMContext):
     await state.set_state(CourseFSM.EXERCISES)
-    day = db.get_day(callback.from_user.id)
-    lesson = db.get_plan(db.get_plan_id(db.get_user_id(callback.from_user.id)))
-    lesson = json.loads(lesson)["data"][day]
-    diag = db.get_diag(db.get_latest_course(db.get_user_id(callback.from_user.id)))
     try:
+        day = db.get_day(callback.from_user.id)
+        lesson = db.get_plan(db.get_plan_id(db.get_user_id(callback.from_user.id)))
+        lesson = json.loads(lesson)["data"][day]
+        diag = db.get_diag(db.get_latest_course(db.get_user_id(callback.from_user.id)))
         exercises = await get_exercises_gpt(lesson, diag)
         # exercises = "упражнения"
     except:
@@ -167,11 +167,11 @@ async def exercises(callback: types.CallbackQuery, state: FSMContext):
 @course_router.callback_query(CourseFSM.EXERCISES)
 async def reflex(callback: types.CallbackQuery, state: FSMContext):
     await state.set_state(CourseFSM.REFLEX)
-    day = db.get_day(callback.from_user.id)
-    lesson = db.get_plan(db.get_plan_id(db.get_user_id(callback.from_user.id)))
-    lesson = json.loads(lesson)["data"][day]
-    diag = db.get_diag(db.get_latest_course(db.get_user_id(callback.from_user.id)))
     try:
+        day = db.get_day(callback.from_user.id)
+        lesson = db.get_plan(db.get_plan_id(db.get_user_id(callback.from_user.id)))
+        lesson = json.loads(lesson)["data"][day]
+        diag = db.get_diag(db.get_latest_course(db.get_user_id(callback.from_user.id)))
         reflex = await get_reflex_gpt(lesson, diag)
         # reflex = "рефлексия"
     except: 
