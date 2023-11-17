@@ -30,7 +30,10 @@ async def stop_bot(bot:Bot):
 @base_router.callback_query(F.data == "menu")
 async def menu(callback: types.CallbackQuery, state: FSMContext):
     await state.set_state(BaseFSM.MENU)
-    await callback.message.delete()
+    try:
+        await callback.message.delete()
+    except:
+        print("Не удалось удалить сообщение")
     await callback.message.answer("Здесь вы можете управлять своими курсами", reply_markup=inline.get_menu_kb())
 
 
@@ -112,6 +115,10 @@ async def about(callback:types.CallbackQuery, state: FSMContext):
 
 @base_router.callback_query(BaseFSM.MENU, F.data == "Начать новое обучение")
 async def about(callback:types.CallbackQuery, state: FSMContext):
+    try:
+        await callback.message.edit_reply_markup(reply_markup=None)
+    except:
+        print("Не удалось удалить кнопки")
     await state.set_state(BaseFSM.NEW)
     await callback.message.answer("Вы уверены, что хотите начать новый курс обучения и сбросить настройки персонализации? Текущий прогресс будет утерян.", reply_markup=inline.get_reset_kb())
     
@@ -120,6 +127,10 @@ async def about(callback:types.CallbackQuery, state: FSMContext):
 @base_router.callback_query(BaseFSM.NEW)
 async def reset_diag(callback: types.CallbackQuery, state: FSMContext):
     if callback.data == "Да":
+        try:
+            await callback.message.edit_reply_markup(reply_markup=None)
+        except:
+            print("Не удалось удалить кнопки")
         await state.clear()
         await position(callback=callback, state=state)
         
@@ -136,17 +147,29 @@ async def support(callback:types.CallbackQuery, state: FSMContext):
 
 @base_router.callback_query(BaseFSM.MENU, F.data == "Мои курсы")
 async def my_courses(callback:types.CallbackQuery, state: FSMContext):
+    try:
+        await callback.message.edit_reply_markup(reply_markup=None)
+    except:
+        print("Не удалось удалить кнопки")
     await state.clear()
     await state.set_state(BaseFSM.COURSES)
     await callback.message.answer("Продолжить прохождение текущего курса или выбрать новый", reply_markup=inline.get_choice_course_kb())
 
 @base_router.callback_query(BaseFSM.COURSES, F.data == "Продолжить")
 async def continue_course(callback:types.CallbackQuery, state: FSMContext):
+    try:
+        await callback.message.edit_reply_markup(reply_markup=None)
+    except:
+        print("Не удалось удалить кнопки")
     await state.set_state(BaseFSM.THIS_COURSE)
     await callback.message.answer("Начать текущий урок?", reply_markup=inline.get_this_lesson_kb())
 
 @base_router.callback_query(BaseFSM.THIS_COURSE, F.data == "Да")
 async def start_this_lesson(callback:types.CallbackQuery, state: FSMContext):
+    try:
+        await callback.message.edit_reply_markup(reply_markup=None)
+    except:
+        print("Не удалось удалить кнопки")
     await state.clear()
     if db.get_course_status(db.get_latest_course(db.get_user_id(callback.from_user.id))) == "end":
         await callback.message.answer("Данный курс кончился", reply_markup=inline.get_next_menu_kb())
@@ -167,10 +190,14 @@ async def all_courses(callback:types.CallbackQuery, state: FSMContext):
     await callback.message.edit_text(msg, reply_markup=None)
     await callback.message.answer("Введите номер курса, который вы хотите выбрать\nНапример: 3", reply_markup=inline.get_next_menu_kb())
 
-@base_router.message(BaseFSM.CHOICE_COURSES)
+@base_router.message(BaseFSM.CHOICE_COURSES, F.text)
 async def choice_course(message: types.Message, state: FSMContext):
     dict_cousres = get_courses_message(db.get_user_id(message.from_user.id))
-    if message.text.isalnum():
+    if len(dict_cousres) == 0:
+        await state.clear()
+        await message.answer("У вас пока нет активных курсов", inline.get_next_menu_kb())
+        return
+    if message.text.isdigit():
         if 0 < int(message.text) < len(dict_cousres) + 1:
             if db.get_course_status(dict_cousres[int(message.text)][0]) != "end":
                 db.upd_latest_course(message.from_user.id, dict_cousres[int(message.text)][0])

@@ -55,7 +55,7 @@ async def main():
     # scheduler.start()
     
     # dp.update.middleware(schedule_middleware.ScheduleMiddleware(scheduler))
-    dp.include_routers(base_router, cmd_router, diag_router, course_router)
+    dp.include_routers(cmd_router, base_router, diag_router, course_router)
     
     await dp.start_polling(bot)
 

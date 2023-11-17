@@ -158,7 +158,7 @@ async def get_lecture_gpt(lesson: str, diag:dict ):
 async def get_frameworks_gpt(lesson: str, diag: dict):
     url = "https://api.openai.com/v1/chat/completions"
     headers = {
-        "Authorization": f'Bearer {os.getenv("GPT")}', #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
+        "Authorization": f'Bearer {os.getenv("GPT")}',
         "Content-Type": "application/json"
     }
     data = {

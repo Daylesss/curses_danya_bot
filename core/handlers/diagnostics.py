@@ -11,7 +11,10 @@ diag_router = Router(name="diag")
 @diag_router.callback_query(F.data == "diagnostics")
 async def position(callback: types.CallbackQuery, state: FSMContext):
     await state.set_state(DiagFSM.POSITION)
-    await callback.message.edit_text(text=callback.message.text, reply_markup=None)
+    try:
+        await callback.message.edit_text(text=callback.message.text, reply_markup=None)
+    except:
+        print("Не удалось изменить сообщение")
     await callback.message.answer(text="Контент для какой компетенции Вам интересен?")
     await callback.message.answer(text="Выберите варианты ниже или укажи текстом свою", reply_markup=inline.get_position_kb())
 
@@ -21,11 +24,14 @@ async def position(callback: types.CallbackQuery, state: FSMContext):
 async def model_of_sales(callback: types.CallbackQuery, state: FSMContext):
     await state.update_data(position = callback.data)
     await state.set_state(DiagFSM.MODEL)
-    await callback.message.edit_text(text=callback.message.text, reply_markup=None)
+    try:
+        await callback.message.edit_text(text=callback.message.text, reply_markup=None)
+    except:
+        print("Не удалось изменить сообщение")
     await callback.message.answer(text="Какая основная модель продаж в Вашей компании?")
     await callback.message.answer(text=" Выберите варианты ниже или укажи текстом свою", reply_markup=inline.get_model_kb())
 
-@diag_router.message(DiagFSM.POSITION)
+@diag_router.message(DiagFSM.POSITION, F.text)
 async def model_of_sales(message: types.Message, state: FSMContext):
     await state.update_data(position = message.text)
     await state.set_state(DiagFSM.MODEL)
@@ -39,11 +45,14 @@ async def model_of_sales(message: types.Message, state: FSMContext):
 async def field(callback: types.CallbackQuery, state: FSMContext):
     await state.update_data(model = callback.data)
     await state.set_state(DiagFSM.FIELD)
-    await callback.message.edit_text(text=callback.message.text, reply_markup=None)
+    try:
+        await callback.message.edit_text(text=callback.message.text, reply_markup=None)
+    except:
+        print("Не удалось изменить сообщение")
     await callback.message.answer(text="Какая основная модель продаж в Вашей компании?")
     await callback.message.answer(text=" Выберите варианты ниже или укажи текстом свою", reply_markup=inline.get_field_kb())
 
-@diag_router.message(DiagFSM.MODEL)
+@diag_router.message(DiagFSM.MODEL, F.text)
 async def field(message: types.Message, state: FSMContext):
     await state.update_data(model = message.text)
     await state.set_state(DiagFSM.FIELD)
@@ -57,11 +66,14 @@ async def field(message: types.Message, state: FSMContext):
 async def niche(callback: types.CallbackQuery, state: FSMContext):
     await state.update_data(field = callback.data)
     await state.set_state(DiagFSM.NICHE)
-    await callback.message.edit_text(text=callback.message.text, reply_markup=None)
+    try:
+        await callback.message.edit_text(text=callback.message.text, reply_markup=None)
+    except:
+        print("Не удалось изменить сообщение")
     await callback.message.answer(text="В какой  нише представлена Ваша компания?")
     await callback.message.answer(text=" Выберите варианты ниже или укажи текстом свою", reply_markup=inline.get_niche_kb())
 
-@diag_router.message(DiagFSM.FIELD)
+@diag_router.message(DiagFSM.FIELD, F.text)
 async def niche(message: types.Message, state: FSMContext):
     await state.update_data(field = message.text)
     await state.set_state(DiagFSM.NICHE)
@@ -75,11 +87,14 @@ async def niche(message: types.Message, state: FSMContext):
 async def service(callback: types.CallbackQuery, state: FSMContext):
     await state.update_data(niche = callback.data)
     await state.set_state(DiagFSM.SERVICE)
-    await callback.message.edit_text(text=callback.message.text, reply_markup=None)
+    try:
+        await callback.message.edit_text(text=callback.message.text, reply_markup=None)
+    except:
+        print("Не удалось изменить сообщение")
     await callback.message.answer(text="Укажите ключевой продукт или услугу Вашей компании")
     await callback.message.answer(text="Напишите текст в свободной форме")
 
-@diag_router.message(DiagFSM.NICHE)
+@diag_router.message(DiagFSM.NICHE, F.text)
 async def service(message: types.Message, state: FSMContext):
     await state.update_data(niche = message.text)
     await state.set_state(DiagFSM.SERVICE)
@@ -89,7 +104,7 @@ async def service(message: types.Message, state: FSMContext):
 
 
 
-@diag_router.message(DiagFSM.SERVICE)
+@diag_router.message(DiagFSM.SERVICE, F.text)
 async def goal(message: types.Message, state: FSMContext):
     await state.update_data(service = message.text)
     await state.set_state(DiagFSM.GOAL)
@@ -102,10 +117,13 @@ async def goal(message: types.Message, state: FSMContext):
 async def problem(callback: types.CallbackQuery, state: FSMContext):
     await state.update_data(goal = callback.data)
     await state.set_state(DiagFSM.PROBLEM)
-    await callback.message.edit_text(text=callback.message.text, reply_markup=None)
+    try:
+        await callback.message.edit_text(text=callback.message.text, reply_markup=None)
+    except:
+        print("Не удалось изменить сообщение")
     await callback.message.answer(text="Сформулируйте четко в свободной форме самую актуальную проблему, которую  Вы хотели бы преодолеть в достижении текущей бизнес-задачи. Например: при холодных звонках не соединяют с ЛПР или другую")
 
-@diag_router.message(DiagFSM.GOAL)
+@diag_router.message(DiagFSM.GOAL, F.text)
 async def problem(message: types.Message, state: FSMContext):
     await state.update_data(goal = message.text)
     await state.set_state(DiagFSM.PROBLEM)
@@ -114,7 +132,7 @@ async def problem(message: types.Message, state: FSMContext):
 
 
 
-@diag_router.message(DiagFSM.PROBLEM)
+@diag_router.message(DiagFSM.PROBLEM, F.text)
 async def end_diag(message: types.Message, state: FSMContext):
     await state.update_data(problem = message.text)
     await state.set_state(DiagFSM.END_DIAG)
@@ -127,7 +145,10 @@ async def end_diag(message: types.Message, state: FSMContext):
 async def confirm_diag(callback: types.CallbackQuery, state: FSMContext):
     if callback.data == "Пройти заново":
         await state.set_state(DiagFSM.RESET)
-        await callback.message.edit_text(text=callback.message.text, reply_markup=None)
+        try:
+            await callback.message.edit_text(text=callback.message.text, reply_markup=None)
+        except:
+            print("Не удалось изменить сообщение")
         await callback.message.answer(text="Вы уверены, что хотите сбросить настройки персонализации?", reply_markup=inline.get_reset_kb())
 
     if callback.data == "Продолжить":
@@ -163,7 +184,10 @@ async def confirm_diag(callback: types.CallbackQuery, state: FSMContext):
 
 
         await state.set_state(CourseFSM.PLAN)
-        await callback.message.edit_text(text=callback.message.text, reply_markup=None)
+        try:
+            await callback.message.edit_text(text=callback.message.text, reply_markup=None)
+        except:
+            print("Не удалось изменить сообщение")
         
         await callback.message.answer("Каждый день Вы будете получать обучающие материалы по теме дня", reply_markup=inline.get_start_course_kb())
 
