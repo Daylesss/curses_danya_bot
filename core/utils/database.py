@@ -35,6 +35,15 @@ class MonoqleDB:
         except:
             return None
     
+    def get_tg_id(self, user_id):
+        self.cursor.execute("SELECT tg_id FROM users WHERE user_id = (%s)", (user_id,))
+        try:
+            ret = self.cursor.fetchone()[0]
+            return ret
+        except:
+            return None
+    
+    
     def add_user(self, tg_id):
         self.cursor.execute("INSERT INTO users (tg_id) VALUES (%s)", (tg_id,))
     
@@ -51,12 +60,6 @@ class MonoqleDB:
         except:
             return None
 
-    # def insert_plan(self, user_id, plan):
-    #     self.cursor.execute("SELECT MAX(plan_created) FROM plans WHERE user_id = %s", (user_id, ))
-    #     plan_created = self.cursor.fetchone()[0]
-    #     print(plan_created)
-    #     self.cursor.execute("UPDATE plans SET plan = %s WHERE user_id = %s AND plan_created = %s", (plan, user_id, plan_created))
-    
     def get_plan_id(self, user_id):
         self.cursor.execute("SELECT plan_id FROM plans WHERE user_id = %s AND plan_created = (SELECT MAX(plan_created) FROM plans WHERE user_id = %s)", (user_id, user_id))
         try:
@@ -101,13 +104,21 @@ class MonoqleDB:
         if course:
             self.cursor.execute("SELECT day FROM user_courses WHERE course_id = %s", (course,))
             return self.cursor.fetchone()[0]
+        
     def get_day_status(self, tg_id :int):
         self.cursor.execute("SELECT latest_course_id FROM users WHERE tg_id = %s", (tg_id, ))
         course = self.cursor.fetchone()
         if course:
             self.cursor.execute("SELECT day_status FROM user_courses WHERE course_id = %s", (course,))
             return self.cursor.fetchone()[0]
-        
+    
+    def get_day_status2(self, user_id :int):
+        self.cursor.execute("SELECT latest_course_id FROM users WHERE user_id = %s", (user_id, ))
+        course = self.cursor.fetchone()
+        if course:
+            self.cursor.execute("SELECT day_status FROM user_courses WHERE course_id = %s", (course,))
+            return self.cursor.fetchone()[0]
+
     def update_day_status(self, course_id, status: str):
         self.cursor.execute("UPDATE user_courses SET day_status = %s WHERE course_id = %s", (status, course_id, ))
     
@@ -125,19 +136,28 @@ class MonoqleDB:
         try:
             return self.cursor.fetchone()[0]
         except: return None
-    
-    
 
     def check_table(self, name_table):
         self.cursor.execute("SELECT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name= %s)", (name_table,))
         return bool(self.cursor.fetchone()[0])
 
     def create_sender_table(self, table_name):
-        self.cursor.execute(f"CREATE TABLE {table_name} (user_id bigint NOT NULL, statuse text, description text, PRIMARY KEY (user_id)) WITH ( OIDS = FALSE)")
+        self.cursor.execute(f"DROP TABLE IF EXISTS {table_name}")
+        self.cursor.execute(f"CREATE TABLE IF NOT EXISTS {table_name} (user_id bigint NOT NULL, statuse text, description text, PRIMARY KEY (user_id)) WITH ( OIDS = FALSE)")
         self.cursor.execute(f"INSERT into {table_name} (user_id, statuse, description) SELECT user_id, 'waiting', NULL FROM users")
 
     def delete_sender_table(self, name_comp):
-        self.cursor.execute(f'DROP TABLE {name_comp}')
+        self.cursor.execute(f'DROP TABLE IF EXISTS {name_comp}')
+    
+    def update_statuse(self, table_name, user_id, statuse, description):
+        self.cursor.execute(f"UPDATE {table_name} SET statuse=%s, description = %s WHERE user_id= %s", (statuse, description, user_id))
+        # query= f"UPDATE {table_name} SET statuse='{statuse}', description ='{description}' WHERE user_id={user_id}"
+    
+    def get_users(self, table_name):
+        self.cursor.execute(f"SELECT user_id FROM {table_name} WHERE statuse='waiting'")
+        result = self.cursor.fetchall()
+
+        return [user[0] for user in result]
 
 db = MonoqleDB()
 

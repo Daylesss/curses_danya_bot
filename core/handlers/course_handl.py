@@ -25,17 +25,27 @@ course_router = Router()
 async def reset_diag(callback: types.CallbackQuery, state: FSMContext):
     if callback.data == "Да":
         await state.clear()
-        await callback.message.edit_reply_markup(reply_markup=None)
+        try:
+            await callback.message.edit_reply_markup(reply_markup=None)
+        except:
+            print("Не удалось изменить кнопки")
         await position(callback=callback, state=state)
         
     if callback.data == "Нет":
         await state.set_state(DiagFSM.END_DIAG)
-        await callback.message.edit_reply_markup(reply_markup=None)
+        try:
+            await callback.message.edit_reply_markup(reply_markup=None)
+        except:
+            print("Не удалось изменить кнопки")
         await callback.message.answer(text="Я успешно настроен для старта Вашего персонального обучения, нажмите продолжить чтобы получить список тем , в которые мы будем погружаться ближайший 21 день", reply_markup = inline.get_end_diag_kb())
 
 
 @course_router.callback_query(CourseFSM.PLAN)
 async def start_course(callback: types.CallbackQuery, state: FSMContext):
+    try:
+        await callback.message.edit_reply_markup(reply_markup=None)
+    except:
+        print("Не удалось изменить кнопки")
     await state.set_state(CourseFSM.LECTURE)
     try:
         day = db.get_day(callback.from_user.id)
@@ -54,8 +64,11 @@ async def start_course(callback: types.CallbackQuery, state: FSMContext):
 
 @course_router.callback_query(CourseFSM.BEFORE_FRAMEWORKS)
 async def framework_answer(callback: types.CallbackQuery, state: FSMContext):
+    try:
+        await callback.message.edit_reply_markup(reply_markup=None)
+    except:
+        print("Не удалось изменить кнопки")
     await state.set_state(CourseFSM.FRAMEWORKS)
-    await callback.message.edit_reply_markup(reply_markup=None)
     try:
         day = db.get_day(callback.from_user.id)
         lesson = db.get_plan(db.get_plan_id(db.get_user_id(callback.from_user.id)))
@@ -74,10 +87,13 @@ async def framework_answer(callback: types.CallbackQuery, state: FSMContext):
 
 @course_router.callback_query(CourseFSM.LECTURE)
 async def frameworks(callback: types.CallbackQuery, state: FSMContext):
+    try:
+        await callback.message.edit_reply_markup(reply_markup=None)
+    except:
+        print("Не удалось изменить кнопки")
 
     if callback.data == "Подробнее":
         await state.set_state(CourseFSM.FEEDBACK_LECTURE)
-        await callback.message.edit_reply_markup(reply_markup=None)
         await callback.message.answer("Сформулируйте четкий вопрос. Например: “хочу узнать более подробно про технику преодоления барьеров в продажах”")
         return
 
@@ -85,7 +101,7 @@ async def frameworks(callback: types.CallbackQuery, state: FSMContext):
         await state.set_state(CourseFSM.BEFORE_FRAMEWORKS)
         await framework_answer(callback = callback, state = state)
 
-@course_router.message(CourseFSM.FEEDBACK_LECTURE)
+@course_router.message(CourseFSM.FEEDBACK_LECTURE, F.text)
 async def feedback_lecture(message: types.Message, state: FSMContext):
     data = await state.get_data()
     try:
@@ -98,10 +114,13 @@ async def feedback_lecture(message: types.Message, state: FSMContext):
 
 @course_router.callback_query(CourseFSM.FRAMEWORKS)
 async def advices(callback: types.CallbackQuery, state: FSMContext):
+    try:
+        await callback.message.edit_reply_markup(reply_markup=None)
+    except:
+        print("Не удалось изменить кнопки")
 
     if callback.data == "Подробнее":
         await state.set_state(CourseFSM.FEEDBACK_FRAMEWORKS)
-        await callback.message.edit_reply_markup(reply_markup=None)
         await callback.message.answer("Сформулируйте четкий вопрос. Например: “хочу узнать более подробно про технику преодоления барьеров в продажах”")
         return
 
@@ -110,7 +129,7 @@ async def advices(callback: types.CallbackQuery, state: FSMContext):
 
 
 
-@course_router.message(CourseFSM.FEEDBACK_FRAMEWORKS)
+@course_router.message(CourseFSM.FEEDBACK_FRAMEWORKS, F.text)
 async def feedback_frameworks(message: types.Message, state: FSMContext):
     data = await state.get_data()
     try:
@@ -122,6 +141,10 @@ async def feedback_frameworks(message: types.Message, state: FSMContext):
 
 @course_router.callback_query(CourseFSM.BEFORE_ADVICES)
 async def advices_answer(callback: types.CallbackQuery, state: FSMContext):
+    try:
+        await callback.message.edit_reply_markup(reply_markup=None)
+    except:
+        print("Не удалось изменить кнопки")
     if is_subscribed(1):
         await state.set_state(CourseFSM.ADVICES)
         try:
@@ -149,6 +172,10 @@ async def advices_answer(callback: types.CallbackQuery, state: FSMContext):
 
 @course_router.callback_query(CourseFSM.ADVICES)
 async def exercises(callback: types.CallbackQuery, state: FSMContext):
+    try:
+        await callback.message.edit_reply_markup(reply_markup=None)
+    except:
+        print("Не удалось изменить кнопки")
     await state.set_state(CourseFSM.EXERCISES)
     try:
         day = db.get_day(callback.from_user.id)
@@ -166,6 +193,10 @@ async def exercises(callback: types.CallbackQuery, state: FSMContext):
 
 @course_router.callback_query(CourseFSM.EXERCISES)
 async def reflex(callback: types.CallbackQuery, state: FSMContext):
+    try:
+        await callback.message.edit_reply_markup(reply_markup=None)
+    except:
+        print("Не удалось изменить кнопки")
     await state.set_state(CourseFSM.REFLEX)
     try:
         day = db.get_day(callback.from_user.id)
@@ -186,3 +217,28 @@ async def reflex(callback: types.CallbackQuery, state: FSMContext):
         db.update_course_status(db.get_latest_course(db.get_user_id(callback.from_user.id)), "end")
     await callback.message.answer("Не забывай сохранять записи своей рефлексии. Они пригодятся для последующего грамотного формирования новых обучающих программ.")
     await callback.message.answer("Надеюсь сегодня было полезно. До завтра", reply_markup = inline.get_next_menu_kb())
+    
+
+@course_router.callback_query(F.data == "Начать")
+async def continue_lesson(callback: types.CallbackQuery, state: FSMContext):
+    try:
+       await callback.message.edit_reply_markup(reply_markup=None)
+    except:
+        print("Не удалось изменить кнопки")
+    await state.clear()
+    day_status = db.get_day_status(callback.from_user.id)
+    if day_status=="end":
+        await callback.message.answer("Начинаем новый урок!")
+        await start_course(callback=callback, state=state)
+    else:
+        await callback.message.answer("Чтобы начать новый урок, нужно сначала закончить старый")
+        if  day_status== "started" or day_status=="lecture":
+            await start_course(callback=callback, state=state)
+        elif day_status=="frameworks":
+            await framework_answer(callback=callback, state=state)
+        elif day_status == "advices":
+            await advices_answer(callback=callback, state=state)
+        elif day_status == "exercises":
+            await exercises(callback=callback, state=state)
+        else:
+            await callback.answer("Что-то пошло не так. Попробуйте выбрать новый курс или продолжить текущий в меню.")

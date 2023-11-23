@@ -28,3 +28,14 @@ async def menu(message: types.Message, state: FSMContext):
     await state.set_state(BaseFSM.MENU)
     await message.answer("Здесь вы можете управлять своими курсами", reply_markup=inline.get_menu_kb())
 
+
+@cmd_router.message(Command("about"))
+async def about(message: types.Message, state: FSMContext):
+    await state.clear()
+    await state.set_state(BaseFSM.ABOUT)
+    await message.answer(text="Здесь вы можете узнать об обучении", reply_markup=inline.get_about_kb())
+
+@cmd_router.message(Command("support"))
+async def support(message: types.Message, state: FSMContext):
+    await state.clear()
+    await message.answer("Ваши предложения, пожелания и вопросы вы можете написать в телеграмм @monoqle_support", reply_markup=inline.get_next_menu_kb())

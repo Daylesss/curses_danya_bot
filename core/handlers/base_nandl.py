@@ -41,10 +41,10 @@ async def menu(callback: types.CallbackQuery, state: FSMContext):
 
 
 
-@base_router.callback_query(BaseFSM.MENU, F.data == "Об обучении")
-async def about(callback:types.CallbackQuery, state: FSMContext):
-    await state.set_state(BaseFSM.ABOUT)
-    await callback.message.edit_reply_markup(reply_markup=inline.get_about_kb())
+# @base_router.callback_query(BaseFSM.MENU, F.data == "Об обучении")
+# async def about(callback:types.CallbackQuery, state: FSMContext):
+#     await state.set_state(BaseFSM.ABOUT)
+#     await callback.message.edit_reply_markup(reply_markup=inline.get_about_kb())
 
 
 @base_router.callback_query(BaseFSM.ABOUT, F.data == "Как правильно учиться")
@@ -139,10 +139,10 @@ async def reset_diag(callback: types.CallbackQuery, state: FSMContext):
         await callback.message.edit_reply_markup(reply_markup=inline.get_next_menu_kb())
 
 
-@base_router.callback_query(BaseFSM.MENU, F.data == "Поддержка")
-async def support(callback:types.CallbackQuery, state: FSMContext):
-    await state.clear()
-    await callback.message.edit_text("Ваши предложения, пожелания и вопросы вы можете написать в телеграмм @monoqle_support", reply_markup=inline.get_next_menu_kb())
+# @base_router.callback_query(BaseFSM.MENU, F.data == "Поддержка")
+# async def support(callback:types.CallbackQuery, state: FSMContext):
+#     await state.clear()
+#     await callback.message.edit_text("Ваши предложения, пожелания и вопросы вы можете написать в телеграмм @monoqle_support", reply_markup=inline.get_next_menu_kb())
 
 
 @base_router.callback_query(BaseFSM.MENU, F.data == "Мои курсы")

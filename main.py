@@ -28,31 +28,32 @@ load_dotenv(find_dotenv())
 
 asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
-#6443979698:AAGsrdgAHZfz0QmCHoReMFHj39-NiCyU7G0
+
 async def main():
-    bot=Bot(token=os.getenv("BOT"), parse_mode='HTML') # 6547617401:AAHSU3c2O_S2G64OWJzdm4hs3h_W43K7_Y4
+    bot=Bot(token=os.getenv("BOT"), parse_mode='HTML')
     logging.basicConfig(level=logging.INFO)
     
-    jobstores = {
-        "default": RedisJobStore(
-            jobs_key="dispatched_trips_job",
-            run_times_key="dispatched_trips_running",
-            host = "localhost",
-            db = 2,
-            port = 6379
-        )
-    }
+    # jobstores = {
+    #     "default": RedisJobStore(
+    #         jobs_key="dispatched_trips_job",
+    #         run_times_key="dispatched_trips_running",
+    #         host = "localhost",
+    #         db = 2,
+    #         port = 6379
+    #     )
+    # }
     
     dp =Dispatcher()
     # scheduler = ContextSchedulerDecorator(AsyncIOScheduler(timezone = "Europe/Moscow", jobstores=jobstores))
+    scheduler = AsyncIOScheduler(timezone = "Europe/Moscow")
     # scheduler.ctx.add_instance(bot, declared_class=Bot)
     # storage = RedisStorage.from_url("redis://localhost:6379/0")
     
     
     
-    # scheduler.add_job(schedule.send_message_cron, trigger='cron', start_date = datetime.now(), 
-    #                   hour=datetime.now().hour, minute = datetime.now().minute + 1)
-    # scheduler.start()
+    scheduler.add_job(schedule.send_remainder, trigger='cron', start_date = datetime.now(), 
+                    hour=datetime.now().hour, minute = datetime.now().minute + 1, kwargs= {"bot": bot})
+    scheduler.start()
     
     # dp.update.middleware(schedule_middleware.ScheduleMiddleware(scheduler))
     dp.include_routers(cmd_router, base_router, diag_router, course_router)

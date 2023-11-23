@@ -188,12 +188,12 @@ def get_next_menu_kb():
 def get_menu_kb():
     builder = InlineKeyboardBuilder()
 
-    builder.button(text="Об обучении", callback_data="Об обучении")
+    # builder.button(text="Об обучении", callback_data="Об обучении")
     builder.button(text="Начать новое обучение", callback_data="Начать новое обучение")
-    builder.button(text="Поддержка", callback_data="Поддержка")
+    # builder.button(text="Поддержка", callback_data="Поддержка")
     builder.button(text="Мои курсы", callback_data="Мои курсы")
 
-    builder.adjust(1,1,1,1)
+    builder.adjust(1,1)
     
     return builder.as_markup()
 
@@ -229,5 +229,14 @@ def get_this_lesson_kb():
 
 
     builder.adjust(2)
+    
+    return builder.as_markup()
+
+def get_reminder_kb():
+    builder = InlineKeyboardBuilder()
+
+    builder.button(text="Начать", callback_data="Начать")
+
+    builder.adjust(1)
     
     return builder.as_markup()
