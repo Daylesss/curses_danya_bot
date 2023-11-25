@@ -48,7 +48,7 @@ async def start_course(callback: types.CallbackQuery, state: FSMContext):
         print("Не удалось изменить кнопки")
     await state.set_state(CourseFSM.LECTURE)
     try:
-        day = db.get_day(callback.from_user.id)
+        day = db.get_day(callback.from_user.id) - 1
         lesson = db.get_plan(db.get_plan_id(db.get_user_id(callback.from_user.id)))
         lesson = json.loads(lesson)["data"][day]
         diag = db.get_diag(db.get_latest_course(db.get_user_id(callback.from_user.id)))
@@ -70,7 +70,7 @@ async def framework_answer(callback: types.CallbackQuery, state: FSMContext):
         print("Не удалось изменить кнопки")
     await state.set_state(CourseFSM.FRAMEWORKS)
     try:
-        day = db.get_day(callback.from_user.id)
+        day = db.get_day(callback.from_user.id) - 1
         lesson = db.get_plan(db.get_plan_id(db.get_user_id(callback.from_user.id)))
         lesson = json.loads(lesson)["data"][day]
         diag = db.get_diag(db.get_latest_course(db.get_user_id(callback.from_user.id)))
@@ -148,7 +148,7 @@ async def advices_answer(callback: types.CallbackQuery, state: FSMContext):
     if is_subscribed(1):
         await state.set_state(CourseFSM.ADVICES)
         try:
-            day = db.get_day(callback.from_user.id)
+            day = db.get_day(callback.from_user.id) - 1
             lesson = db.get_plan(db.get_plan_id(db.get_user_id(callback.from_user.id)))
             lesson = json.loads(lesson)["data"][day]
             diag = db.get_diag(db.get_latest_course(db.get_user_id(callback.from_user.id)))
@@ -178,7 +178,7 @@ async def exercises(callback: types.CallbackQuery, state: FSMContext):
         print("Не удалось изменить кнопки")
     await state.set_state(CourseFSM.EXERCISES)
     try:
-        day = db.get_day(callback.from_user.id)
+        day = db.get_day(callback.from_user.id) - 1
         lesson = db.get_plan(db.get_plan_id(db.get_user_id(callback.from_user.id)))
         lesson = json.loads(lesson)["data"][day]
         diag = db.get_diag(db.get_latest_course(db.get_user_id(callback.from_user.id)))
@@ -199,7 +199,7 @@ async def reflex(callback: types.CallbackQuery, state: FSMContext):
         print("Не удалось изменить кнопки")
     await state.set_state(CourseFSM.REFLEX)
     try:
-        day = db.get_day(callback.from_user.id)
+        day = db.get_day(callback.from_user.id) - 1
         lesson = db.get_plan(db.get_plan_id(db.get_user_id(callback.from_user.id)))
         lesson = json.loads(lesson)["data"][day]
         diag = db.get_diag(db.get_latest_course(db.get_user_id(callback.from_user.id)))
@@ -211,7 +211,7 @@ async def reflex(callback: types.CallbackQuery, state: FSMContext):
     await callback.message.answer(reflex)
     await state.clear()
     db.update_day_status(db.get_latest_course(db.get_user_id(callback.from_user.id)), "end")
-    if day <= 21:
+    if day < 21:
         db.update_day(db.get_latest_course(db.get_user_id(callback.from_user.id)), day+1)
     else:
         db.update_course_status(db.get_latest_course(db.get_user_id(callback.from_user.id)), "end")

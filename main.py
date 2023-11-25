@@ -4,15 +4,11 @@ from aiogram.types import Message, ContentType
 import logging
 from aiogram.filters import Command
 from aiogram import F
-import asyncpg
 from datetime import datetime, timedelta
 from aiogram.utils.chat_action import ChatActionSender
 from aiogram import Router
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from apscheduler_di import ContextSchedulerDecorator
 from datetime import datetime
-from aiogram.fsm.storage.redis import RedisStorage
-from apscheduler.jobstores.redis import RedisJobStore
 from core.handlers.base_nandl import base_router
 from core.handlers.command_handl import cmd_router
 from core.handlers.diagnostics import diag_router
@@ -26,7 +22,7 @@ from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv())
 
 
-asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+#asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 
 async def main():
@@ -52,7 +48,7 @@ async def main():
     
     
     scheduler.add_job(schedule.send_remainder, trigger='cron', start_date = datetime.now(), 
-                    hour=datetime.now().hour, minute = datetime.now().minute + 1, kwargs= {"bot": bot})
+                    hour=10, minute = 0, kwargs= {"bot": bot})
     scheduler.start()
     
     # dp.update.middleware(schedule_middleware.ScheduleMiddleware(scheduler))
