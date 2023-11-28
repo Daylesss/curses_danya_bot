@@ -23,6 +23,7 @@ course_router = Router()
 
 @course_router.callback_query(DiagFSM.RESET)
 async def reset_diag(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.answer(f"💬 {callback.data}")
     if callback.data == "Да":
         await state.clear()
         try:
@@ -42,6 +43,8 @@ async def reset_diag(callback: types.CallbackQuery, state: FSMContext):
 
 @course_router.callback_query(CourseFSM.PLAN)
 async def start_course(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.answer(f"💬 {callback.data}")
+    await callback.message.answer("Минутку, я подбираю Вам контент...")
     try:
         await callback.message.edit_reply_markup(reply_markup=None)
     except:
@@ -64,6 +67,8 @@ async def start_course(callback: types.CallbackQuery, state: FSMContext):
 
 @course_router.callback_query(CourseFSM.BEFORE_FRAMEWORKS)
 async def framework_answer(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.answer(f"💬 {callback.data}")
+    await callback.message.answer("Минутку, я подбираю Вам контент...")
     try:
         await callback.message.edit_reply_markup(reply_markup=None)
     except:
@@ -87,6 +92,8 @@ async def framework_answer(callback: types.CallbackQuery, state: FSMContext):
 
 @course_router.callback_query(CourseFSM.LECTURE)
 async def frameworks(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.answer(f"💬 {callback.data}")
+    await callback.message.answer("Минутку, я подбираю Вам контент...")
     try:
         await callback.message.edit_reply_markup(reply_markup=None)
     except:
@@ -103,6 +110,7 @@ async def frameworks(callback: types.CallbackQuery, state: FSMContext):
 
 @course_router.message(CourseFSM.FEEDBACK_LECTURE, F.text)
 async def feedback_lecture(message: types.Message, state: FSMContext):
+    await message.answer("Минутку...")
     data = await state.get_data()
     try:
         feedback = await get_feedback_gpt(context = data["context"], question = message.text)
@@ -114,6 +122,8 @@ async def feedback_lecture(message: types.Message, state: FSMContext):
 
 @course_router.callback_query(CourseFSM.FRAMEWORKS)
 async def advices(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.answer(f"💬 {callback.data}")
+    await callback.message.answer("Минутку, я подбираю Вам контент...")
     try:
         await callback.message.edit_reply_markup(reply_markup=None)
     except:
@@ -131,6 +141,7 @@ async def advices(callback: types.CallbackQuery, state: FSMContext):
 
 @course_router.message(CourseFSM.FEEDBACK_FRAMEWORKS, F.text)
 async def feedback_frameworks(message: types.Message, state: FSMContext):
+    await message.answer("Минутку...")
     data = await state.get_data()
     try:
         feedback = await get_feedback_gpt(context = data["context"], question = message.text)
@@ -141,6 +152,7 @@ async def feedback_frameworks(message: types.Message, state: FSMContext):
 
 @course_router.callback_query(CourseFSM.BEFORE_ADVICES)
 async def advices_answer(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.answer(f"💬 {callback.data}")
     try:
         await callback.message.edit_reply_markup(reply_markup=None)
     except:
@@ -172,6 +184,8 @@ async def advices_answer(callback: types.CallbackQuery, state: FSMContext):
 
 @course_router.callback_query(CourseFSM.ADVICES)
 async def exercises(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.answer(f"💬 {callback.data}")
+    await callback.message.answer("Минутку, я подбираю Вам контент...")
     try:
         await callback.message.edit_reply_markup(reply_markup=None)
     except:
@@ -193,6 +207,8 @@ async def exercises(callback: types.CallbackQuery, state: FSMContext):
 
 @course_router.callback_query(CourseFSM.EXERCISES)
 async def reflex(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.answer(f"💬 {callback.data}")
+    await callback.message.answer("Минутку, я подбираю Вам контент...")
     try:
         await callback.message.edit_reply_markup(reply_markup=None)
     except:
@@ -216,13 +232,14 @@ async def reflex(callback: types.CallbackQuery, state: FSMContext):
     else:
         db.update_course_status(db.get_latest_course(db.get_user_id(callback.from_user.id)), "end")
     await callback.message.answer("Не забывай сохранять записи своей рефлексии. Они пригодятся для последующего грамотного формирования новых обучающих программ.")
-    await callback.message.answer("Надеюсь сегодня было полезно. До завтра", reply_markup = inline.get_next_menu_kb())
-    
+    await callback.message.answer("Надеюсь сегодня было полезно. До завтра", reply_markup = inline.get_next_menu_theme_kb())
 
-@course_router.callback_query(F.data == "Начать")
+
+@course_router.callback_query(F.data == "Начать" or F.data =="Следующая тема")
 async def continue_lesson(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.answer(f"💬 {callback.data}")
     try:
-       await callback.message.edit_reply_markup(reply_markup=None)
+        await callback.message.edit_reply_markup(reply_markup=None)
     except:
         print("Не удалось изменить кнопки")
     await state.clear()

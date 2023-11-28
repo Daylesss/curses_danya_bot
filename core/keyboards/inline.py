@@ -3,8 +3,8 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 def get_start_kb():
     builder = InlineKeyboardBuilder()
 
-    builder.button(text="К диагностике", callback_data="diagnostics")
-    builder.button(text="Меню", callback_data="menu")
+    builder.button(text="К диагностике", callback_data="К диагностике")
+    builder.button(text="Меню", callback_data="Меню")
     
     builder.adjust(1, 1)
     
@@ -13,16 +13,16 @@ def get_start_kb():
 def get_position_kb():
     builder = InlineKeyboardBuilder()
 
-    builder.button(text="Генеральный директор", callback_data="Gen_dir")
-    builder.button(text="Руководитель отдела продаж", callback_data="Head_of_Sales")
-    builder.button(text="Менеджер отдела продаж", callback_data="Sales")
-    builder.button(text="Менеджер по работе с клиентами", callback_data="Customer")
-    builder.button(text="Менеджер по маркетингу и рекламе", callback_data="Marketing")
-    builder.button(text="Менеджер по персоналу", callback_data="HR")
-    builder.button(text="Менеджер по логистике", callback_data="Logistics")
-    builder.button(text="Менеджер интернет-магазина", callback_data="Online_store")
-    builder.button(text="Контент-менеджер", callback_data="Content")
-    builder.button(text="SMM-специалист", callback_data="SMM")
+    builder.button(text="Генеральный директор", callback_data="Генеральный директор")
+    builder.button(text="Руководитель отдела продаж", callback_data="Руководитель отдела продаж")
+    builder.button(text="Менеджер отдела продаж", callback_data="Менеджер отдела продаж")
+    builder.button(text="Менеджер по работе с клиентами", callback_data="Менеджер по работе с клиентами")
+    builder.button(text="Менеджер по маркетингу и рекламе", callback_data="Менеджер по маркетингу и рекламе")
+    builder.button(text="Менеджер по персоналу", callback_data="Менеджер по персоналу")
+    builder.button(text="Менеджер по логистике", callback_data="Менеджер по логистике")
+    builder.button(text="Менеджер интернет-магазина", callback_data="Менеджер интернет-магазина")
+    builder.button(text="Контент-менеджер", callback_data="Контент-менеджер")
+    builder.button(text="SMM-специалист", callback_data="SMM-специалист")
     
     # builder.button(text="", callback_data="User_position")
     
@@ -179,7 +179,7 @@ def get_reflex_kb():
 def get_next_menu_kb():
     builder = InlineKeyboardBuilder()
 
-    builder.button(text="Меню", callback_data="menu")
+    builder.button(text="Меню", callback_data="Меню")
 
     builder.adjust(1)
     
@@ -191,9 +191,9 @@ def get_menu_kb():
     # builder.button(text="Об обучении", callback_data="Об обучении")
     builder.button(text="Начать новое обучение", callback_data="Начать новое обучение")
     # builder.button(text="Поддержка", callback_data="Поддержка")
-    builder.button(text="Мои курсы", callback_data="Мои курсы")
+    # builder.button(text="Мои курсы", callback_data="Мои курсы")
 
-    builder.adjust(1,1)
+    builder.adjust(1)
     
     return builder.as_markup()
 
@@ -204,7 +204,7 @@ def get_about_kb():
     builder.button(text="Как работать с фреймворками", callback_data="Как работать с фреймворками")
     builder.button(text="Как применять знания на практике", callback_data="Как применять знания на практике")
     builder.button(text="Как проводить рефлексию", callback_data="Как проводить рефлексию")
-    builder.button(text="Меню", callback_data="menu")
+    builder.button(text="Меню", callback_data="Меню")
 
     builder.adjust(1,1,1,1,1)
     
@@ -225,7 +225,7 @@ def get_this_lesson_kb():
     builder = InlineKeyboardBuilder()
 
     builder.button(text="Да", callback_data="Да")
-    builder.button(text="Меню", callback_data="menu")
+    builder.button(text="Меню", callback_data="Меню")
 
 
     builder.adjust(2)
@@ -238,5 +238,15 @@ def get_reminder_kb():
     builder.button(text="Начать", callback_data="Начать")
 
     builder.adjust(1)
+    
+    return builder.as_markup()
+
+def get_next_menu_theme_kb():
+    builder = InlineKeyboardBuilder()
+
+    builder.button(text="Меню", callback_data="Меню")
+    builder.button(text="Следующая тема", callback_data="Следующая тема")
+
+    builder.adjust(1,1)
     
     return builder.as_markup()

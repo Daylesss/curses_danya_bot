@@ -2,14 +2,16 @@ from aiogram import Router
 from aiogram import Bot, Router, types
 from aiogram import F
 from aiogram.fsm.context import FSMContext
+import json
 from core.utils.fsm import DiagFSM, CourseFSM
 from core.keyboards import inline
 from core.utils.chatgpt import get_course_plan
 from core.utils.database import db
 diag_router = Router(name="diag")
 
-@diag_router.callback_query(F.data == "diagnostics")
+@diag_router.callback_query(F.data == "К диагностике")
 async def position(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.answer(f"💬 {callback.data}")
     await state.set_state(DiagFSM.POSITION)
     try:
         await callback.message.edit_text(text=callback.message.text, reply_markup=None)
@@ -22,6 +24,7 @@ async def position(callback: types.CallbackQuery, state: FSMContext):
 
 @diag_router.callback_query(DiagFSM.POSITION)
 async def model_of_sales(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.answer(f"💬 {callback.data}")
     await state.update_data(position = callback.data)
     await state.set_state(DiagFSM.MODEL)
     try:
@@ -43,6 +46,7 @@ async def model_of_sales(message: types.Message, state: FSMContext):
 
 @diag_router.callback_query(DiagFSM.MODEL)
 async def field(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.answer(f"💬 {callback.data}")
     await state.update_data(model = callback.data)
     await state.set_state(DiagFSM.FIELD)
     try:
@@ -64,6 +68,7 @@ async def field(message: types.Message, state: FSMContext):
 
 @diag_router.callback_query(DiagFSM.FIELD)
 async def niche(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.answer(f"💬 {callback.data}")
     await state.update_data(field = callback.data)
     await state.set_state(DiagFSM.NICHE)
     try:
@@ -85,6 +90,7 @@ async def niche(message: types.Message, state: FSMContext):
 
 @diag_router.callback_query(DiagFSM.NICHE)
 async def service(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.answer(f"💬 {callback.data}")
     await state.update_data(niche = callback.data)
     await state.set_state(DiagFSM.SERVICE)
     try:
@@ -96,6 +102,7 @@ async def service(callback: types.CallbackQuery, state: FSMContext):
 
 @diag_router.message(DiagFSM.NICHE, F.text)
 async def service(message: types.Message, state: FSMContext):
+    
     await state.update_data(niche = message.text)
     await state.set_state(DiagFSM.SERVICE)
     # await message.edit_reply_markup(reply_markup=None)
@@ -115,6 +122,7 @@ async def goal(message: types.Message, state: FSMContext):
 
 @diag_router.callback_query(DiagFSM.GOAL)
 async def problem(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.answer(f"💬 {callback.data}")
     await state.update_data(goal = callback.data)
     await state.set_state(DiagFSM.PROBLEM)
     try:
@@ -139,10 +147,24 @@ async def end_diag(message: types.Message, state: FSMContext):
     await message.answer(text="Я успешно настроен для старта Вашего персонального обучения, нажмите продолжить чтобы получить список тем , в которые мы будем погружаться ближайший 21 день", reply_markup = inline.get_end_diag_kb())
 
 
+def plan_formating(user_id: int)->str:
+    plan_str = "Список тем для вашего обучения:\n\n"
+    plan = db.get_plan(db.get_plan_id(user_id))
+    plan = json.loads(plan)["data"]
+    for n, theme in enumerate(plan):
+        plan_str += f"{theme}\n\n"
+    
+    return plan_str
+
 
 
 @diag_router.callback_query(DiagFSM.END_DIAG)
 async def confirm_diag(callback: types.CallbackQuery, state: FSMContext):
+    try:
+        await callback.message.edit_reply_markup(reply_markup=None)
+    except:
+        print("Не удалось изменить кнопки")
+    await callback.message.answer(f"💬 {callback.data}")
     if callback.data == "Пройти заново":
         await state.set_state(DiagFSM.RESET)
         try:
@@ -152,6 +174,7 @@ async def confirm_diag(callback: types.CallbackQuery, state: FSMContext):
         await callback.message.answer(text="Вы уверены, что хотите сбросить настройки персонализации?", reply_markup=inline.get_reset_kb())
 
     if callback.data == "Продолжить":
+        await callback.message.answer("Минутку, я подбираю Вам контент...")
         diag_data = await state.get_data()
         await state.clear()
         plan = await get_course_plan(diag_data)
@@ -188,6 +211,10 @@ async def confirm_diag(callback: types.CallbackQuery, state: FSMContext):
             await callback.message.edit_text(text=callback.message.text, reply_markup=None)
         except:
             print("Не удалось изменить сообщение")
+        
+        plan_str = plan_formating(db.get_user_id(callback.from_user.id))
+        
+        await callback.message.answer(plan_str)
         
         await callback.message.answer("Каждый день Вы будете получать обучающие материалы по теме дня", reply_markup=inline.get_start_course_kb())
 

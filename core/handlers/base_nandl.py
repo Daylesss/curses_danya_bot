@@ -27,13 +27,14 @@ async def stop_bot(bot:Bot):
     await bot.send_message(os.getenv('ADMIN'), "Courses bot stopped.")
 
 
-@base_router.callback_query(F.data == "menu")
+@base_router.callback_query(F.data == "Меню")
 async def menu(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.answer(f"💬 {callback.data}")
     await state.set_state(BaseFSM.MENU)
     try:
-        await callback.message.delete()
+        await callback.message.edit_reply_markup(reply_markup=None)
     except:
-        print("Не удалось удалить сообщение")
+        print("Не удалось изменить кнопки")
     await callback.message.answer("Здесь вы можете управлять своими курсами", reply_markup=inline.get_menu_kb())
 
 
@@ -115,6 +116,7 @@ async def about(callback:types.CallbackQuery, state: FSMContext):
 
 @base_router.callback_query(BaseFSM.MENU, F.data == "Начать новое обучение")
 async def about(callback:types.CallbackQuery, state: FSMContext):
+    await callback.message.answer(f"💬 {callback.data}")
     try:
         await callback.message.edit_reply_markup(reply_markup=None)
     except:
@@ -126,6 +128,7 @@ async def about(callback:types.CallbackQuery, state: FSMContext):
 
 @base_router.callback_query(BaseFSM.NEW)
 async def reset_diag(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.answer(f"💬 {callback.data}")
     if callback.data == "Да":
         try:
             await callback.message.edit_reply_markup(reply_markup=None)
@@ -147,6 +150,7 @@ async def reset_diag(callback: types.CallbackQuery, state: FSMContext):
 
 @base_router.callback_query(BaseFSM.MENU, F.data == "Мои курсы")
 async def my_courses(callback:types.CallbackQuery, state: FSMContext):
+    await callback.message.answer(f"💬 {callback.data}")
     try:
         await callback.message.edit_reply_markup(reply_markup=None)
     except:
@@ -157,6 +161,7 @@ async def my_courses(callback:types.CallbackQuery, state: FSMContext):
 
 @base_router.callback_query(BaseFSM.COURSES, F.data == "Продолжить")
 async def continue_course(callback:types.CallbackQuery, state: FSMContext):
+    await callback.message.answer(f"💬 {callback.data}")
     try:
         await callback.message.edit_reply_markup(reply_markup=None)
     except:
@@ -166,6 +171,7 @@ async def continue_course(callback:types.CallbackQuery, state: FSMContext):
 
 @base_router.callback_query(BaseFSM.THIS_COURSE, F.data == "Да")
 async def start_this_lesson(callback:types.CallbackQuery, state: FSMContext):
+    await callback.message.answer(f"💬 {callback.data}")
     try:
         await callback.message.edit_reply_markup(reply_markup=None)
     except:
@@ -182,6 +188,7 @@ async def start_this_lesson(callback:types.CallbackQuery, state: FSMContext):
 
 @base_router.callback_query(BaseFSM.COURSES, F.data == "Выбрать")
 async def all_courses(callback:types.CallbackQuery, state: FSMContext):
+    await callback.message.answer(f"💬 {callback.data}")
     await state.set_state(BaseFSM.CHOICE_COURSES)
     dict_cousres = get_courses_message(db.get_user_id(callback.from_user.id))
     msg = ""
