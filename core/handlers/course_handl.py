@@ -51,34 +51,39 @@ async def start_course(callback: types.CallbackQuery, state: FSMContext):
         print("Не удалось изменить кнопки")
     await state.set_state(CourseFSM.LECTURE)
     ex = None
+    exc = None
     try:
         day = db.get_day(callback.from_user.id) - 1
         lesson = db.get_plan(db.get_plan_id(db.get_user_id(callback.from_user.id)))
-    except:
+    except Exception as e:
         if not ex:
+            exc = e
             ex = "не удалось получить план"
     try:
         lesson = json.loads(lesson)["data"][day]
         diag = db.get_diag(db.get_latest_course(db.get_user_id(callback.from_user.id)))
-    except:
+    except Exception as e:
         if not ex:
+            exc = e
             ex = "Не удалось получить диагностику (json)"
     try:
         lecture = await get_lecture_gpt(lesson, diag)
-    except:
+    except Exception as e:
         if not ex:
+            exc = e
             ex ="Вызов генерации не удался"
             
     try:
         await state.update_data(context = lecture)
         await callback.message.answer(lecture, reply_markup=inline.get_lecture_kb())
         db.update_day_status(db.get_latest_course(db.get_user_id(callback.from_user.id)), "lecture")
-    except:
+    except Exception as e:
         if not ex:
+            exc = e
             ex = "Не удалось сгенерировать контент"
     if ex:
         with open("Logs.txt", "a", encoding = "utf-8") as f:
-            f.write(f"{callback.from_user.id} ({callback.from_user.username}) {ex}\n")
+            f.write(f"{callback.from_user.id} ({callback.from_user.username}) {ex} - [{exc}]\n")
         await callback.message.answer(ex, reply_markup=inline.get_lecture_kb())
 
 
@@ -95,30 +100,34 @@ async def framework_answer(callback: types.CallbackQuery, state: FSMContext):
     try:
         day = db.get_day(callback.from_user.id) - 1
         lesson = db.get_plan(db.get_plan_id(db.get_user_id(callback.from_user.id)))
-    except:
+    except Exception as e:
         if not ex:
+            exc = e
             ex = "не удалось получить план"
     try:
         lesson = json.loads(lesson)["data"][day]
         diag = db.get_diag(db.get_latest_course(db.get_user_id(callback.from_user.id)))
-    except:
+    except Exception as e:
         if not ex:
+            exc = e
             ex = "Не удалось получить диагностику (json)"
     try:
         frameworks = await get_frameworks_gpt(lesson, diag)
-    except:
+    except Exception as e:
         if not ex:
+            exc = e
             ex ="Вызов генерации не удался"
     try:
         await state.update_data(context = frameworks)
         await callback.message.answer(text=frameworks, reply_markup=inline.get_frameworks_kb())
         db.update_day_status(db.get_latest_course(db.get_user_id(callback.from_user.id)), "frameworks")
-    except:
+    except Exception as e:
         if not ex:
+            exc = e
             ex = "Не удалось сгенерировать контент"
     if ex:
         with open("Logs.txt", "a", encoding = "utf-8") as f:
-            f.write(f"{callback.from_user.id} ({callback.from_user.username}) {ex}\n")
+            f.write(f"{callback.from_user.id} ({callback.from_user.username}) {ex} - [{exc}]\n")
         await callback.message.answer(ex, reply_markup=inline.get_frameworks_kb())
 
 
@@ -195,29 +204,33 @@ async def advices_answer(callback: types.CallbackQuery, state: FSMContext):
         try:
             day = db.get_day(callback.from_user.id) - 1
             lesson = db.get_plan(db.get_plan_id(db.get_user_id(callback.from_user.id)))
-        except:
+        except Exception as e:
             if not ex:
+                exc = e
                 ex = "не удалось получить план"
         try:
             lesson = json.loads(lesson)["data"][day]
             diag = db.get_diag(db.get_latest_course(db.get_user_id(callback.from_user.id)))
-        except:
+        except Exception as e:
             if not ex:
+                exc = e
                 ex = "Не удалось получить диагностику (json)"
         try:
             advices = await get_advices_gpt(lesson, diag)
-        except:
+        except Exception as e:
             if not ex:
+                exc = e
                 ex ="Вызов генерации не удался"
         try:
             await callback.message.answer(text=advices, reply_markup=inline.get_ex_kb())
             db.update_day_status(db.get_latest_course(db.get_user_id(callback.from_user.id)), "advices")
-        except:
+        except Exception as e:
             if not ex:
+                exc = e
                 ex = "Не удалось сгенерировать контент"
         if ex:
             with open("Logs.txt", "a", encoding = "utf-8") as f:
-                f.write(f"{callback.from_user.id} ({callback.from_user.username}) {ex}")
+                f.write(f"{callback.from_user.id} ({callback.from_user.username}) {ex} \n")
             await callback.message.answer(ex, reply_markup=inline.get_ex_kb())
     else:
         await callback.message.answer("Вы завершили ознакомительную версию. Для продолжения погружения в обучающую программу, пожалуйста оплатите доступ. Привлечение финансов позволяет развивать продукт и делать его еще более совершенным.")
@@ -239,29 +252,33 @@ async def exercises(callback: types.CallbackQuery, state: FSMContext):
     try:
         day = db.get_day(callback.from_user.id) - 1
         lesson = db.get_plan(db.get_plan_id(db.get_user_id(callback.from_user.id)))
-    except:
+    except Exception as e:
         if not ex:
+            exc = e
             ex = "не удалось получить план"
     try:
         lesson = json.loads(lesson)["data"][day]
         diag = db.get_diag(db.get_latest_course(db.get_user_id(callback.from_user.id)))
-    except:
+    except Exception as e:
         if not ex:
+            exc = e
             ex = "Не удалось получить диагностику (json)"
     try:
         exercises = await get_exercises_gpt(lesson, diag)
-    except:
+    except Exception as e:
         if not ex:
+            exc = e
             ex ="Вызов генерации не удался"
     try:
         await callback.message.answer(exercises, reply_markup=inline.get_reflex_kb())
         db.update_day_status(db.get_latest_course(db.get_user_id(callback.from_user.id)), "exercises")
-    except:
+    except Exception as e:
         if not ex:
+            exc = e
             ex = "Не удалось сгенерировать контент"
     if ex:
         with open("Logs.txt", "a", encoding = "utf-8") as f:
-            f.write(f"{callback.from_user.id} ({callback.from_user.username}) {ex}\n")
+            f.write(f"{callback.from_user.id} ({callback.from_user.username}) {ex} - [{exc}]\n")
         await callback.message.answer(ex, reply_markup=inline.get_reflex_kb())
 
 @course_router.callback_query(CourseFSM.EXERCISES)
@@ -277,24 +294,28 @@ async def reflex(callback: types.CallbackQuery, state: FSMContext):
     try:
         day = db.get_day(callback.from_user.id) - 1
         lesson = db.get_plan(db.get_plan_id(db.get_user_id(callback.from_user.id)))
-    except:
+    except Exception as e:
         if not ex:
+            exc = e
             ex = "не удалось получить план"
     try:
         lesson = json.loads(lesson)["data"][day]
         diag = db.get_diag(db.get_latest_course(db.get_user_id(callback.from_user.id)))
-    except:
+    except Exception as e:
         if not ex:
+            exc = e
             ex = "Не удалось получить диагностику (json)"
     try:
         reflex = await get_reflex_gpt(lesson, diag)
-    except:
+    except Exception as e:
         if not ex:
+            exc = e
             ex ="Вызов генерации не удался"
     try:
         await callback.message.answer(reflex)
-    except:
+    except Exception as e:
         if not ex:
+            exc = e
             ex ="Не удалось сгенерировать контент"
     try:
         await state.clear()
@@ -303,12 +324,13 @@ async def reflex(callback: types.CallbackQuery, state: FSMContext):
             db.update_day(db.get_latest_course(db.get_user_id(callback.from_user.id)), day+2)
         else:
             db.update_course_status(db.get_latest_course(db.get_user_id(callback.from_user.id)), "end")
-    except:
+    except Exception as e:
         if not ex:
+            exc = e
             ex = "Не удалось обновить день"
     if ex:
         with open("Logs.txt", "a", encoding = "utf-8") as f:
-            f.write(f"{callback.from_user.id} ({callback.from_user.username}) {ex}\n")
+            f.write(f"{callback.from_user.id} ({callback.from_user.username}) {ex} - [{exc}]\n")
         await callback.message.answer(ex, reply_markup=inline.get_lecture_kb())
     await callback.message.answer("Не забывай сохранять записи своей рефлексии. Они пригодятся для последующего грамотного формирования новых обучающих программ.")
     await callback.message.answer("Надеюсь сегодня было полезно. До завтра", reply_markup = inline.get_next_menu_theme_kb())
