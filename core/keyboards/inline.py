@@ -4,9 +4,9 @@ def get_start_kb():
     builder = InlineKeyboardBuilder()
 
     builder.button(text="К диагностике", callback_data="К диагностике")
-    builder.button(text="Меню", callback_data="Меню")
+    # builder.button(text="Меню", callback_data="Меню")
     
-    builder.adjust(1, 1)
+    builder.adjust(1)
     
     return builder.as_markup()
 
@@ -177,25 +177,27 @@ def get_reflex_kb():
     return builder.as_markup()
 
 def get_next_menu_kb():
-    builder = InlineKeyboardBuilder()
+    return None
+    # builder = InlineKeyboardBuilder()
 
-    builder.button(text="Меню", callback_data="Меню")
+    # builder.button(text="Меню", callback_data="Меню")
 
-    builder.adjust(1)
+    # builder.adjust(1)
     
-    return builder.as_markup()
+    # return builder.as_markup()
 
-def get_menu_kb():
-    builder = InlineKeyboardBuilder()
+# def get_menu_kb():
+#     return None
+    # builder = InlineKeyboardBuilder()
 
-    # builder.button(text="Об обучении", callback_data="Об обучении")
-    builder.button(text="Начать новое обучение", callback_data="Начать новое обучение")
-    # builder.button(text="Поддержка", callback_data="Поддержка")
-    # builder.button(text="Мои курсы", callback_data="Мои курсы")
+    # # builder.button(text="Об обучении", callback_data="Об обучении")
+    # builder.button(text="Начать новое обучение", callback_data="Начать новое обучение")
+    # # builder.button(text="Поддержка", callback_data="Поддержка")
+    # # builder.button(text="Мои курсы", callback_data="Мои курсы")
 
-    builder.adjust(1)
+    # builder.adjust(1)
     
-    return builder.as_markup()
+    # return builder.as_markup()
 
 def get_about_kb():
     builder = InlineKeyboardBuilder()
@@ -204,9 +206,9 @@ def get_about_kb():
     builder.button(text="Как работать с фреймворками", callback_data="Как работать с фреймворками")
     builder.button(text="Как применять знания на практике", callback_data="Как применять знания на практике")
     builder.button(text="Как проводить рефлексию", callback_data="Как проводить рефлексию")
-    builder.button(text="Меню", callback_data="Меню")
+    # builder.button(text="Меню", callback_data="Меню")
 
-    builder.adjust(1,1,1,1,1)
+    builder.adjust(1,1,1,1)
     
     return builder.as_markup()
 
@@ -225,7 +227,7 @@ def get_this_lesson_kb():
     builder = InlineKeyboardBuilder()
 
     builder.button(text="Да", callback_data="Да")
-    builder.button(text="Меню", callback_data="Меню")
+    builder.button(text="Нет", callback_data="not_lesson")
 
 
     builder.adjust(2)
@@ -244,9 +246,31 @@ def get_reminder_kb():
 def get_next_menu_theme_kb():
     builder = InlineKeyboardBuilder()
 
-    builder.button(text="Меню", callback_data="Меню")
+    # builder.button(text="Меню", callback_data="Меню")
     builder.button(text="Следующая тема", callback_data="Следующая тема")
 
-    builder.adjust(1,1)
+    builder.adjust(1)
+    
+    return builder.as_markup()
+
+def continue_theme_kb():
+    builder = InlineKeyboardBuilder()
+
+    # builder.button(text="Меню", callback_data="Меню")
+    builder.button(text="Да", callback_data="Продолжить текущую")
+    builder.button(text="Нет", callback_data="not_continue")
+
+    builder.adjust(1, 1)
+    
+    return builder.as_markup()
+
+def next_theme_kb():
+    builder = InlineKeyboardBuilder()
+
+    # builder.button(text="Меню", callback_data="Меню")
+    builder.button(text="Продолжить текущую", callback_data="Продолжить текущую")
+    builder.button(text="Начать следующую", callback_data="Начать следующую")
+
+    builder.adjust(1, 1)
     
     return builder.as_markup()

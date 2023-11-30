@@ -95,7 +95,7 @@ async def get_course_plan(diag: dict):
         "Content-Type": "application/json"
     }
     data = {
-    "model": "gpt-3.5-turbo-16k",
+    "model": "gpt-4",
     "messages": [{"role": "system", "content": prompt_plan},
                 {"role": "user", "content": diag_formating(diag)}],
     "temperature": 0.7}
@@ -136,7 +136,7 @@ async def get_lecture_gpt(lesson: str, diag:dict ):
     }
 
     data = {
-    "model": "gpt-3.5-turbo-16k",
+    "model": "gpt-4",
     "messages": [{"role": "system", "content": prompt_lecture(lesson)},
                 {"role": "user", "content": diag_formating(diag)}],
     "temperature": 0.7}
@@ -162,7 +162,7 @@ async def get_frameworks_gpt(lesson: str, diag: dict):
         "Content-Type": "application/json"
     }
     data = {
-    "model": "gpt-3.5-turbo-16k",
+    "model": "gpt-4",
     "messages": [{"role": "system", "content": prompt_frameworks(lesson)},
                 {"role": "user", "content": diag_formating(diag)}],
     "temperature": 0.7}
@@ -189,7 +189,7 @@ async def get_feedback_gpt(context: str, question: str):
         "Content-Type": "application/json"
     }
     data = {
-    "model": "gpt-3.5-turbo-16k",
+    "model": "gpt-4",
     "messages": [{"role": "system", "content": f"Твоя задача подробно ответить на вопрос пользователя по следующему контексту:\nКонтекст: {context}"},
                 {"role": "user", "content": question}],
     "temperature": 0.7}
@@ -216,7 +216,7 @@ async def get_advices_gpt(lesson: str, diag: dict):
         "Content-Type": "application/json"
     }
     data = {
-    "model": "gpt-3.5-turbo-16k",
+    "model": "gpt-4",
     "messages": [{"role": "system", "content": prompt_advices(lesson)},
                 {"role": "user", "content": diag_formating(diag)}],
     "temperature": 0.7}
@@ -241,7 +241,7 @@ async def get_exercises_gpt(lesson: str, diag: dict):
         "Content-Type": "application/json"
     }
     data = {
-    "model": "gpt-3.5-turbo-16k",
+    "model": "gpt-4",
     "messages": [{"role": "system", "content": prompt_exercises(lesson)},
                 {"role": "user", "content": diag_formating(diag)}],
     "temperature": 0.7}
@@ -265,7 +265,7 @@ async def get_reflex_gpt(lesson: str, diag: dict):
         "Content-Type": "application/json"
     }
     data = {
-    "model": "gpt-3.5-turbo-16k",
+    "model": "gpt-4",
     "messages": [{"role": "system", "content": prompt_reflex(lesson)},
                 {"role": "user", "content": diag_formating(diag)}],
     "temperature": 0.7}

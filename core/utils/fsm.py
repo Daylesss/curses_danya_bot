@@ -34,3 +34,6 @@ class BaseFSM(StatesGroup):
     COURSES = State()
     CHOICE_COURSES =State()
     THIS_COURSE = State()
+    
+class Cmd_FSM(StatesGroup):
+    NEXT_THEME = State()

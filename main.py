@@ -41,15 +41,15 @@ async def main():
     
     dp =Dispatcher()
     # scheduler = ContextSchedulerDecorator(AsyncIOScheduler(timezone = "Europe/Moscow", jobstores=jobstores))
-    scheduler = AsyncIOScheduler(timezone = "Europe/Moscow")
+    # scheduler = AsyncIOScheduler(timezone = "Europe/Moscow")
     # scheduler.ctx.add_instance(bot, declared_class=Bot)
     # storage = RedisStorage.from_url("redis://localhost:6379/0")
     
     
     
-    scheduler.add_job(schedule.send_remainder, trigger='cron', start_date = datetime.now(), 
-                    hour=10, minute = 0, kwargs= {"bot": bot})
-    scheduler.start()
+    # scheduler.add_job(schedule.send_remainder, trigger='cron', start_date = datetime.now(), 
+    #                 hour=10, minute = 0, kwargs= {"bot": bot})
+    # scheduler.start()
     
     # dp.update.middleware(schedule_middleware.ScheduleMiddleware(scheduler))
     dp.include_routers(cmd_router, base_router, diag_router, course_router)

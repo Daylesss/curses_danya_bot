@@ -227,7 +227,7 @@ async def reflex(callback: types.CallbackQuery, state: FSMContext):
     await callback.message.answer(reflex)
     await state.clear()
     db.update_day_status(db.get_latest_course(db.get_user_id(callback.from_user.id)), "end")
-    if day < 21:
+    if day < 20:
         db.update_day(db.get_latest_course(db.get_user_id(callback.from_user.id)), day+1)
     else:
         db.update_course_status(db.get_latest_course(db.get_user_id(callback.from_user.id)), "end")
@@ -235,14 +235,18 @@ async def reflex(callback: types.CallbackQuery, state: FSMContext):
     await callback.message.answer("Надеюсь сегодня было полезно. До завтра", reply_markup = inline.get_next_menu_theme_kb())
 
 
-@course_router.callback_query(F.data == "Начать" or F.data =="Следующая тема")
+@course_router.callback_query(F.data =="Следующая тема")
 async def continue_lesson(callback: types.CallbackQuery, state: FSMContext):
     await callback.message.answer(f"💬 {callback.data}")
     try:
         await callback.message.edit_reply_markup(reply_markup=None)
     except:
         print("Не удалось изменить кнопки")
+    
     await state.clear()
+    if db.get_course_status(db.get_latest_course(db.get_user_id(callback.from_user.id))) == "end":
+        await callback.message.answer("Данный курс кончился. Вы можете начать новый, пользуясь командой в меню.", reply_markup=inline.get_next_menu_kb())
+        return
     day_status = db.get_day_status(callback.from_user.id)
     if day_status=="end":
         await callback.message.answer("Начинаем новый урок!")

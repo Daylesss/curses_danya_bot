@@ -27,15 +27,15 @@ async def stop_bot(bot:Bot):
     await bot.send_message(os.getenv('ADMIN'), "Courses bot stopped.")
 
 
-@base_router.callback_query(F.data == "Меню")
-async def menu(callback: types.CallbackQuery, state: FSMContext):
-    await callback.message.answer(f"💬 {callback.data}")
-    await state.set_state(BaseFSM.MENU)
-    try:
-        await callback.message.edit_reply_markup(reply_markup=None)
-    except:
-        print("Не удалось изменить кнопки")
-    await callback.message.answer("Здесь вы можете управлять своими курсами", reply_markup=inline.get_menu_kb())
+# @base_router.callback_query(F.data == "Меню")
+# async def menu(callback: types.CallbackQuery, state: FSMContext):
+#     await callback.message.answer(f"💬 {callback.data}")
+#     await state.set_state(BaseFSM.MENU)
+#     try:
+#         await callback.message.edit_reply_markup(reply_markup=None)
+#     except:
+#         print("Не удалось изменить кнопки")
+#     await callback.message.answer("Здесь вы можете управлять своими курсами", reply_markup=inline.get_menu_kb())
 
 
 
@@ -180,11 +180,7 @@ async def start_this_lesson(callback:types.CallbackQuery, state: FSMContext):
     if db.get_course_status(db.get_latest_course(db.get_user_id(callback.from_user.id))) == "end":
         await callback.message.answer("Данный курс кончился", reply_markup=inline.get_next_menu_kb())
         return
-    day_status = db.get_day_status(callback.from_user.id)
-    if day_status == "end":
-        await callback.message.answer("Вы уже прошли сегодняшний день. Ожидайте следующее сообщение в 10:00 по Мск", reply_markup=inline.get_next_menu_kb())
-    else:
-        await start_course(callback = callback, state = state)
+    
 
 @base_router.callback_query(BaseFSM.COURSES, F.data == "Выбрать")
 async def all_courses(callback:types.CallbackQuery, state: FSMContext):
