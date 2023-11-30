@@ -38,7 +38,7 @@ async def next_theme(message: types.Message, state: FSMContext):
 
 @cmd_router.callback_query(Cmd_FSM.NEXT_THEME, F.data=="not_continue")
 async def not_continue_lesson(callback: types.CallbackQuery, state: FSMContext):
-    await callback.message.answer(f"💬 {callback.data}")
+    await callback.message.answer(f"💬 Нет")
     try:
         await callback.message.edit_reply_markup(reply_markup=None)
     except:
@@ -59,7 +59,7 @@ async def to_next_theme(callback: types.CallbackQuery, state: FSMContext):
         return
     day = db.get_day(callback.from_user.id) - 1
     if day < 20:
-        db.update_day(db.get_latest_course(db.get_user_id(callback.from_user.id)), day+1)
+        db.update_day(db.get_latest_course(db.get_user_id(callback.from_user.id)), day+2)
         await callback.message.answer("Начинаем новый урок!")
         await start_course(callback=callback, state=state)
     else:

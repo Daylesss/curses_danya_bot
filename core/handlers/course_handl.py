@@ -92,14 +92,14 @@ async def framework_answer(callback: types.CallbackQuery, state: FSMContext):
 
 @course_router.callback_query(CourseFSM.LECTURE)
 async def frameworks(callback: types.CallbackQuery, state: FSMContext):
-    await callback.message.answer(f"💬 {callback.data}")
-    await callback.message.answer("Минутку, я подбираю Вам контент...")
-    try:
-        await callback.message.edit_reply_markup(reply_markup=None)
-    except:
-        print("Не удалось изменить кнопки")
 
     if callback.data == "Подробнее":
+        await callback.message.answer(f"💬 {callback.data}")
+        await callback.message.answer("Минутку, я подбираю Вам контент...")
+        try:
+            await callback.message.edit_reply_markup(reply_markup=None)
+        except:
+            print("Не удалось изменить кнопки")
         await state.set_state(CourseFSM.FEEDBACK_LECTURE)
         await callback.message.answer("Сформулируйте четкий вопрос. Например: “хочу узнать более подробно про технику преодоления барьеров в продажах”")
         return
@@ -122,7 +122,6 @@ async def feedback_lecture(message: types.Message, state: FSMContext):
 
 @course_router.callback_query(CourseFSM.FRAMEWORKS)
 async def advices(callback: types.CallbackQuery, state: FSMContext):
-    await callback.message.answer(f"💬 {callback.data}")
     await callback.message.answer("Минутку, я подбираю Вам контент...")
     try:
         await callback.message.edit_reply_markup(reply_markup=None)
@@ -130,6 +129,7 @@ async def advices(callback: types.CallbackQuery, state: FSMContext):
         print("Не удалось изменить кнопки")
 
     if callback.data == "Подробнее":
+        await callback.message.answer(f"💬 {callback.data}")
         await state.set_state(CourseFSM.FEEDBACK_FRAMEWORKS)
         await callback.message.answer("Сформулируйте четкий вопрос. Например: “хочу узнать более подробно про технику преодоления барьеров в продажах”")
         return
@@ -228,7 +228,7 @@ async def reflex(callback: types.CallbackQuery, state: FSMContext):
     await state.clear()
     db.update_day_status(db.get_latest_course(db.get_user_id(callback.from_user.id)), "end")
     if day < 20:
-        db.update_day(db.get_latest_course(db.get_user_id(callback.from_user.id)), day+1)
+        db.update_day(db.get_latest_course(db.get_user_id(callback.from_user.id)), day+2)
     else:
         db.update_course_status(db.get_latest_course(db.get_user_id(callback.from_user.id)), "end")
     await callback.message.answer("Не забывай сохранять записи своей рефлексии. Они пригодятся для последующего грамотного формирования новых обучающих программ.")
@@ -237,7 +237,6 @@ async def reflex(callback: types.CallbackQuery, state: FSMContext):
 
 @course_router.callback_query(F.data =="Следующая тема")
 async def continue_lesson(callback: types.CallbackQuery, state: FSMContext):
-    await callback.message.answer(f"💬 {callback.data}")
     try:
         await callback.message.edit_reply_markup(reply_markup=None)
     except:
@@ -245,6 +244,7 @@ async def continue_lesson(callback: types.CallbackQuery, state: FSMContext):
     
     await state.clear()
     if db.get_course_status(db.get_latest_course(db.get_user_id(callback.from_user.id))) == "end":
+        await callback.message.answer(f"💬 {callback.data}")
         await callback.message.answer("Данный курс кончился. Вы можете начать новый, пользуясь командой в меню.", reply_markup=inline.get_next_menu_kb())
         return
     day_status = db.get_day_status(callback.from_user.id)
