@@ -102,15 +102,15 @@ async def get_course_plan(diag: dict):
 
     timeout = aiohttp.ClientTimeout(total=600)
     async with aiohttp.ClientSession(timeout=timeout) as session:
-        try:
+        # try:
             resp= await session.post(url, headers=headers, data=json.dumps(data))
             
             gpt_resp = await resp.json()
             
             gpt_txt = gpt_resp["choices"][0]["message"]["content"]
             return gpt_txt
-        except:
-            return "Что-то пошло не так"
+        # except:
+        #     return "Что-то пошло не так во время генерации"
         # except:
         #     await bot.send_message(callback.from_user.id, f'Почему-то запрос не обрабатывается... Возможно сервер перегружен, попробуй позже. Для перезапуска нажмите /start.')
         #     await state.clear()
@@ -143,15 +143,15 @@ async def get_lecture_gpt(lesson: str, diag:dict ):
 
     timeout = aiohttp.ClientTimeout(total=600)
     async with aiohttp.ClientSession(timeout=timeout) as session:
-        try:
+        # try:
             resp= await session.post(url, headers=headers, data=json.dumps(data))
             
             gpt_resp = await resp.json()
             
             gpt_txt = gpt_resp["choices"][0]["message"]["content"]
             return gpt_txt
-        except:
-            return "Что-то пошло не так"
+        # except:
+        #     return "Что-то пошло не так во время генерации"
 
 
 
@@ -170,15 +170,15 @@ async def get_frameworks_gpt(lesson: str, diag: dict):
     timeout = aiohttp.ClientTimeout(total=600)
     async with aiohttp.ClientSession(timeout=timeout) as session:
         # try:
-        try:
+        # try:
             resp= await session.post(url, headers=headers, data=json.dumps(data))
             
             gpt_resp = await resp.json()
             
             gpt_txt = gpt_resp["choices"][0]["message"]["content"]
             return gpt_txt
-        except:
-            return "Что-то пошло не так"
+        # except:
+        #     return "Что-то пошло не так во время генерации"
 
 
 
@@ -196,15 +196,15 @@ async def get_feedback_gpt(context: str, question: str):
 
     timeout = aiohttp.ClientTimeout(total=600)
     async with aiohttp.ClientSession(timeout=timeout) as session:
-        try:
+        # try:
             resp= await session.post(url, headers=headers, data=json.dumps(data))
             
             gpt_resp = await resp.json()
             
             gpt_txt = gpt_resp["choices"][0]["message"]["content"]
             return gpt_txt
-        except:
-            return "Что-то пошло не так"
+        # except:
+        #     return "Что-то пошло не так во время генерации"
 
 
 
@@ -223,15 +223,15 @@ async def get_advices_gpt(lesson: str, diag: dict):
 
     timeout = aiohttp.ClientTimeout(total=600)
     async with aiohttp.ClientSession(timeout=timeout) as session:
-        try:
+        # try:
             resp= await session.post(url, headers=headers, data=json.dumps(data))
             
             gpt_resp = await resp.json()
             
             gpt_txt = gpt_resp["choices"][0]["message"]["content"]
             return gpt_txt
-        except:
-            return "Что-то пошло не так"
+        # except:
+            # return "Что-то пошло не так во время генерации"
 
 
 async def get_exercises_gpt(lesson: str, diag: dict):
@@ -248,15 +248,15 @@ async def get_exercises_gpt(lesson: str, diag: dict):
 
     timeout = aiohttp.ClientTimeout(total=600)
     async with aiohttp.ClientSession(timeout=timeout) as session:
-        try:
+        # try:
             resp= await session.post(url, headers=headers, data=json.dumps(data))
             
             gpt_resp = await resp.json()
             
             gpt_txt = gpt_resp["choices"][0]["message"]["content"]
             return gpt_txt
-        except:
-            return "Что-то пошло не так"
+        # except:
+        #     return "Что-то пошло не так во время генерации"
 
 async def get_reflex_gpt(lesson: str, diag: dict):
     url = "https://api.openai.com/v1/chat/completions"
@@ -272,12 +272,12 @@ async def get_reflex_gpt(lesson: str, diag: dict):
 
     timeout = aiohttp.ClientTimeout(total=600)
     async with aiohttp.ClientSession(timeout=timeout) as session:
-        try:
+        # try:
             resp= await session.post(url, headers=headers, data=json.dumps(data))
             
             gpt_resp = await resp.json()
             
             gpt_txt = gpt_resp["choices"][0]["message"]["content"]
             return gpt_txt
-        except:
-            return "Что-то пошло не так"
+        # except:
+        #     return "Что-то пошло не так во время генерации"

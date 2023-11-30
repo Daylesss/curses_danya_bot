@@ -50,19 +50,36 @@ async def start_course(callback: types.CallbackQuery, state: FSMContext):
     except:
         print("Не удалось изменить кнопки")
     await state.set_state(CourseFSM.LECTURE)
+    ex = None
     try:
         day = db.get_day(callback.from_user.id) - 1
         lesson = db.get_plan(db.get_plan_id(db.get_user_id(callback.from_user.id)))
+    except:
+        if not ex:
+            ex = "не удалось получить план"
+    try:
         lesson = json.loads(lesson)["data"][day]
         diag = db.get_diag(db.get_latest_course(db.get_user_id(callback.from_user.id)))
-
+    except:
+        if not ex:
+            ex = "Не удалось получить диагностику (json)"
+    try:
         lecture = await get_lecture_gpt(lesson, diag)
-        # lecture = "лекция"
+    except:
+        if not ex:
+            ex ="Вызов генерации не удался"
+            
+    try:
         await state.update_data(context = lecture)
         await callback.message.answer(lecture, reply_markup=inline.get_lecture_kb())
         db.update_day_status(db.get_latest_course(db.get_user_id(callback.from_user.id)), "lecture")
     except:
-        await callback.message.answer("Что-то пошло не так", reply_markup=inline.get_lecture_kb())
+        if not ex:
+            ex = "Не удалось сгенерировать контент"
+    if ex:
+        with open("Logs.txt", "a", encoding = "utf-8") as f:
+            f.write(f"{callback.from_user.id} ({callback.from_user.username}) {ex}\n")
+        await callback.message.answer(ex, reply_markup=inline.get_lecture_kb())
 
 
 @course_router.callback_query(CourseFSM.BEFORE_FRAMEWORKS)
@@ -74,21 +91,36 @@ async def framework_answer(callback: types.CallbackQuery, state: FSMContext):
     except:
         print("Не удалось изменить кнопки")
     await state.set_state(CourseFSM.FRAMEWORKS)
+    ex = None
     try:
         day = db.get_day(callback.from_user.id) - 1
         lesson = db.get_plan(db.get_plan_id(db.get_user_id(callback.from_user.id)))
+    except:
+        if not ex:
+            ex = "не удалось получить план"
+    try:
         lesson = json.loads(lesson)["data"][day]
         diag = db.get_diag(db.get_latest_course(db.get_user_id(callback.from_user.id)))
-
-                
+    except:
+        if not ex:
+            ex = "Не удалось получить диагностику (json)"
+    try:
         frameworks = await get_frameworks_gpt(lesson, diag)
-        # frameworks = "фреймворки"
-
+    except:
+        if not ex:
+            ex ="Вызов генерации не удался"
+    try:
         await state.update_data(context = frameworks)
         await callback.message.answer(text=frameworks, reply_markup=inline.get_frameworks_kb())
         db.update_day_status(db.get_latest_course(db.get_user_id(callback.from_user.id)), "frameworks")
     except:
-        await callback.message.answer("Что-то пошло не так", reply_markup=inline.get_frameworks_kb())
+        if not ex:
+            ex = "Не удалось сгенерировать контент"
+    if ex:
+        with open("Logs.txt", "a", encoding = "utf-8") as f:
+            f.write(f"{callback.from_user.id} ({callback.from_user.username}) {ex}\n")
+        await callback.message.answer(ex, reply_markup=inline.get_frameworks_kb())
+
 
 @course_router.callback_query(CourseFSM.LECTURE)
 async def frameworks(callback: types.CallbackQuery, state: FSMContext):
@@ -159,22 +191,34 @@ async def advices_answer(callback: types.CallbackQuery, state: FSMContext):
         print("Не удалось изменить кнопки")
     if is_subscribed(1):
         await state.set_state(CourseFSM.ADVICES)
+        ex = None
         try:
             day = db.get_day(callback.from_user.id) - 1
             lesson = db.get_plan(db.get_plan_id(db.get_user_id(callback.from_user.id)))
+        except:
+            if not ex:
+                ex = "не удалось получить план"
+        try:
             lesson = json.loads(lesson)["data"][day]
             diag = db.get_diag(db.get_latest_course(db.get_user_id(callback.from_user.id)))
-            try:
-                advices = await get_advices_gpt(lesson, diag)
-                # aadvices ="Советы"
-                
-            except:
-                advices = "Не удалось сгенерировать советы"
+        except:
+            if not ex:
+                ex = "Не удалось получить диагностику (json)"
+        try:
+            advices = await get_advices_gpt(lesson, diag)
+        except:
+            if not ex:
+                ex ="Вызов генерации не удался"
+        try:
             await callback.message.answer(text=advices, reply_markup=inline.get_ex_kb())
             db.update_day_status(db.get_latest_course(db.get_user_id(callback.from_user.id)), "advices")
-            return
         except:
-            await callback.message.answer("Что-то пошло не так", reply_markup=inline.get_ex_kb())
+            if not ex:
+                ex = "Не удалось сгенерировать контент"
+        if ex:
+            with open("Logs.txt", "a", encoding = "utf-8") as f:
+                f.write(f"{callback.from_user.id} ({callback.from_user.username}) {ex}")
+            await callback.message.answer(ex, reply_markup=inline.get_ex_kb())
     else:
         await callback.message.answer("Вы завершили ознакомительную версию. Для продолжения погружения в обучающую программу, пожалуйста оплатите доступ. Привлечение финансов позволяет развивать продукт и делать его еще более совершенным.")
         await callback.message.answer("Что Вас ждет в платном доступе: \n1. 3 недели интенсива по индивидуальному плану обучения.\n2. Теоретические и практические материалы для эффективного погружения и повышения своего уровня компетенции.\3. Фреймворки, модели, рабочие инструменты и практические советы чтобы стать специалистом высокого уровня на своем рабочем месте.\nДо 10 дополнительных вопросов по теме.\nДо 10 новых курсов в подборке")
@@ -191,19 +235,34 @@ async def exercises(callback: types.CallbackQuery, state: FSMContext):
     except:
         print("Не удалось изменить кнопки")
     await state.set_state(CourseFSM.EXERCISES)
+    ex = None
     try:
         day = db.get_day(callback.from_user.id) - 1
         lesson = db.get_plan(db.get_plan_id(db.get_user_id(callback.from_user.id)))
+    except:
+        if not ex:
+            ex = "не удалось получить план"
+    try:
         lesson = json.loads(lesson)["data"][day]
         diag = db.get_diag(db.get_latest_course(db.get_user_id(callback.from_user.id)))
-        exercises = await get_exercises_gpt(lesson, diag)
-        # exercises = "упражнения"
     except:
-        exercises = "Не удалось сгенерировать задания"
-    
-    await callback.message.answer(exercises, reply_markup=inline.get_reflex_kb())
-    db.update_day_status(db.get_latest_course(db.get_user_id(callback.from_user.id)), "exercises")
-    
+        if not ex:
+            ex = "Не удалось получить диагностику (json)"
+    try:
+        exercises = await get_exercises_gpt(lesson, diag)
+    except:
+        if not ex:
+            ex ="Вызов генерации не удался"
+    try:
+        await callback.message.answer(exercises, reply_markup=inline.get_reflex_kb())
+        db.update_day_status(db.get_latest_course(db.get_user_id(callback.from_user.id)), "exercises")
+    except:
+        if not ex:
+            ex = "Не удалось сгенерировать контент"
+    if ex:
+        with open("Logs.txt", "a", encoding = "utf-8") as f:
+            f.write(f"{callback.from_user.id} ({callback.from_user.username}) {ex}\n")
+        await callback.message.answer(ex, reply_markup=inline.get_reflex_kb())
 
 @course_router.callback_query(CourseFSM.EXERCISES)
 async def reflex(callback: types.CallbackQuery, state: FSMContext):
@@ -214,23 +273,43 @@ async def reflex(callback: types.CallbackQuery, state: FSMContext):
     except:
         print("Не удалось изменить кнопки")
     await state.set_state(CourseFSM.REFLEX)
+    ex = None
     try:
         day = db.get_day(callback.from_user.id) - 1
         lesson = db.get_plan(db.get_plan_id(db.get_user_id(callback.from_user.id)))
+    except:
+        if not ex:
+            ex = "не удалось получить план"
+    try:
         lesson = json.loads(lesson)["data"][day]
         diag = db.get_diag(db.get_latest_course(db.get_user_id(callback.from_user.id)))
+    except:
+        if not ex:
+            ex = "Не удалось получить диагностику (json)"
+    try:
         reflex = await get_reflex_gpt(lesson, diag)
-        # reflex = "рефлексия"
-    except: 
-        reflex = "Не удалось сгенерировать рефлексию"
-
-    await callback.message.answer(reflex)
-    await state.clear()
-    db.update_day_status(db.get_latest_course(db.get_user_id(callback.from_user.id)), "end")
-    if day < 20:
-        db.update_day(db.get_latest_course(db.get_user_id(callback.from_user.id)), day+2)
-    else:
-        db.update_course_status(db.get_latest_course(db.get_user_id(callback.from_user.id)), "end")
+    except:
+        if not ex:
+            ex ="Вызов генерации не удался"
+    try:
+        await callback.message.answer(reflex)
+    except:
+        if not ex:
+            ex ="Не удалось сгенерировать контент"
+    try:
+        await state.clear()
+        db.update_day_status(db.get_latest_course(db.get_user_id(callback.from_user.id)), "end")
+        if day < 20:
+            db.update_day(db.get_latest_course(db.get_user_id(callback.from_user.id)), day+2)
+        else:
+            db.update_course_status(db.get_latest_course(db.get_user_id(callback.from_user.id)), "end")
+    except:
+        if not ex:
+            ex = "Не удалось обновить день"
+    if ex:
+        with open("Logs.txt", "a", encoding = "utf-8") as f:
+            f.write(f"{callback.from_user.id} ({callback.from_user.username}) {ex}\n")
+        await callback.message.answer(ex, reply_markup=inline.get_lecture_kb())
     await callback.message.answer("Не забывай сохранять записи своей рефлексии. Они пригодятся для последующего грамотного формирования новых обучающих программ.")
     await callback.message.answer("Надеюсь сегодня было полезно. До завтра", reply_markup = inline.get_next_menu_theme_kb())
 
