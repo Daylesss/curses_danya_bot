@@ -3,6 +3,7 @@ from aiogram import Bot, Router, types
 from aiogram import F
 from aiogram.fsm.context import FSMContext
 import json
+import datetime
 from core.utils.fsm import DiagFSM, CourseFSM
 from core.keyboards import inline
 from core.utils.database import is_subscribed
@@ -67,7 +68,7 @@ async def start_course(callback: types.CallbackQuery, state: FSMContext):
             exc = e
             ex = "Не удалось получить диагностику (json)"
     try:
-        lecture = await get_lecture_gpt(lesson, diag)
+        lecture = await get_lecture_gpt(lesson, diag, callback.from_user.id)
     except Exception as e:
         if not ex:
             exc = e
@@ -80,10 +81,11 @@ async def start_course(callback: types.CallbackQuery, state: FSMContext):
     except Exception as e:
         if not ex:
             exc = e
-            ex = "Не удалось сгенерировать контент"
+            ex = "Не удалось отправить контент и обновить статус"
     if ex:
         with open("Logs.txt", "a", encoding = "utf-8") as f:
-            f.write(f"{callback.from_user.id} ({callback.from_user.username}) {ex} - [{exc}]\n")
+            time =datetime.datetime.utcnow()
+            f.write(f"{time}:  {callback.from_user.id} ({callback.from_user.username}) {ex} - [{exc}]\n")
         await callback.message.answer(ex, reply_markup=inline.get_lecture_kb())
 
 
@@ -112,7 +114,7 @@ async def framework_answer(callback: types.CallbackQuery, state: FSMContext):
             exc = e
             ex = "Не удалось получить диагностику (json)"
     try:
-        frameworks = await get_frameworks_gpt(lesson, diag)
+        frameworks = await get_frameworks_gpt(lesson, diag, callback.from_user.id)
     except Exception as e:
         if not ex:
             exc = e
@@ -124,10 +126,11 @@ async def framework_answer(callback: types.CallbackQuery, state: FSMContext):
     except Exception as e:
         if not ex:
             exc = e
-            ex = "Не удалось сгенерировать контент"
+            ex = "Не удалось отправить контент и обновить статус"
     if ex:
         with open("Logs.txt", "a", encoding = "utf-8") as f:
-            f.write(f"{callback.from_user.id} ({callback.from_user.username}) {ex} - [{exc}]\n")
+            time =datetime.datetime.utcnow()
+            f.write(f"{time}:  {callback.from_user.id} ({callback.from_user.username}) {ex} - [{exc}]\n")
         await callback.message.answer(ex, reply_markup=inline.get_frameworks_kb())
 
 
@@ -154,7 +157,7 @@ async def feedback_lecture(message: types.Message, state: FSMContext):
     await message.answer("Минутку...")
     data = await state.get_data()
     try:
-        feedback = await get_feedback_gpt(context = data["context"], question = message.text)
+        feedback = await get_feedback_gpt(context = data["context"], question = message.text, tg_id=message.from_user.id)
     except:
         feedback = "не удалось сгенерировать ответ на ваш вопрос"
     await state.set_state(CourseFSM.BEFORE_FRAMEWORKS)
@@ -185,7 +188,7 @@ async def feedback_frameworks(message: types.Message, state: FSMContext):
     await message.answer("Минутку...")
     data = await state.get_data()
     try:
-        feedback = await get_feedback_gpt(context = data["context"], question = message.text)
+        feedback = await get_feedback_gpt(context = data["context"], question = message.text, tg_id=message.from_user.id)
     except:
         feedback = "не удалось сгенерировать ответ на ваш вопрос"
     await state.set_state(CourseFSM.BEFORE_ADVICES)
@@ -216,7 +219,7 @@ async def advices_answer(callback: types.CallbackQuery, state: FSMContext):
                 exc = e
                 ex = "Не удалось получить диагностику (json)"
         try:
-            advices = await get_advices_gpt(lesson, diag)
+            advices = await get_advices_gpt(lesson, diag, callback.from_user.id)
         except Exception as e:
             if not ex:
                 exc = e
@@ -227,10 +230,11 @@ async def advices_answer(callback: types.CallbackQuery, state: FSMContext):
         except Exception as e:
             if not ex:
                 exc = e
-                ex = "Не удалось сгенерировать контент"
+                ex = "Не удалось отправить контент и обновить статус"
         if ex:
             with open("Logs.txt", "a", encoding = "utf-8") as f:
-                f.write(f"{callback.from_user.id} ({callback.from_user.username}) {ex} \n")
+                time =datetime.datetime.utcnow()
+                f.write(f"{time}:  {callback.from_user.id} ({callback.from_user.username}) {ex} - [{exc}]\n")
             await callback.message.answer(ex, reply_markup=inline.get_ex_kb())
     else:
         await callback.message.answer("Вы завершили ознакомительную версию. Для продолжения погружения в обучающую программу, пожалуйста оплатите доступ. Привлечение финансов позволяет развивать продукт и делать его еще более совершенным.")
@@ -264,7 +268,7 @@ async def exercises(callback: types.CallbackQuery, state: FSMContext):
             exc = e
             ex = "Не удалось получить диагностику (json)"
     try:
-        exercises = await get_exercises_gpt(lesson, diag)
+        exercises = await get_exercises_gpt(lesson, diag, callback.from_user.id)
     except Exception as e:
         if not ex:
             exc = e
@@ -275,10 +279,11 @@ async def exercises(callback: types.CallbackQuery, state: FSMContext):
     except Exception as e:
         if not ex:
             exc = e
-            ex = "Не удалось сгенерировать контент"
+            ex = "Не удалось отправить контент и обновить статус"
     if ex:
         with open("Logs.txt", "a", encoding = "utf-8") as f:
-            f.write(f"{callback.from_user.id} ({callback.from_user.username}) {ex} - [{exc}]\n")
+            time =datetime.datetime.utcnow()
+            f.write(f"{time}:  {callback.from_user.id} ({callback.from_user.username}) {ex} - [{exc}]\n")
         await callback.message.answer(ex, reply_markup=inline.get_reflex_kb())
 
 @course_router.callback_query(CourseFSM.EXERCISES)
@@ -306,7 +311,7 @@ async def reflex(callback: types.CallbackQuery, state: FSMContext):
             exc = e
             ex = "Не удалось получить диагностику (json)"
     try:
-        reflex = await get_reflex_gpt(lesson, diag)
+        reflex = await get_reflex_gpt(lesson, diag, callback.from_user.id)
     except Exception as e:
         if not ex:
             exc = e
@@ -316,7 +321,7 @@ async def reflex(callback: types.CallbackQuery, state: FSMContext):
     except Exception as e:
         if not ex:
             exc = e
-            ex ="Не удалось сгенерировать контент"
+            ex ="Не удалось отправить контент и обновить статус"
     try:
         await state.clear()
         db.update_day_status(db.get_latest_course(db.get_user_id(callback.from_user.id)), "end")
@@ -330,7 +335,8 @@ async def reflex(callback: types.CallbackQuery, state: FSMContext):
             ex = "Не удалось обновить день"
     if ex:
         with open("Logs.txt", "a", encoding = "utf-8") as f:
-            f.write(f"{callback.from_user.id} ({callback.from_user.username}) {ex} - [{exc}]\n")
+            time =datetime.datetime.utcnow()
+            f.write(f"{time}:  {callback.from_user.id} ({callback.from_user.username}) {ex} - [{exc}]\n")
         await callback.message.answer(ex, reply_markup=inline.get_lecture_kb())
     await callback.message.answer("Не забывай сохранять записи своей рефлексии. Они пригодятся для последующего грамотного формирования новых обучающих программ.")
     await callback.message.answer("Надеюсь сегодня было полезно. До завтра", reply_markup = inline.get_next_menu_theme_kb())

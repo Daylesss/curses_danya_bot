@@ -12,7 +12,7 @@ class MonoqleDB:
                                         # пароль, который указали при установке PostgreSQL
                                         password="4587",
                                         host="127.0.0.1",
-                                        port="5432",
+                                        port="5433",
                                         database = 'postgres')
             self.connection.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
             # Курсор для выполнения операций с базой данных

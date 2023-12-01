@@ -178,7 +178,7 @@ async def confirm_diag(callback: types.CallbackQuery, state: FSMContext):
         diag_data = await state.get_data()
         try:
         # await state.clear()
-            plan = await get_course_plan(diag_data)
+            plan = await get_course_plan(diag_data, tg_id=callback.from_user.id)
             db.insert_plan(db.get_user_id(callback.from_user.id), diag_data, plan)
             db.set_course(db.get_plan_id(db.get_user_id(callback.from_user.id)))
             plan_str = plan_formating(db.get_user_id(callback.from_user.id))

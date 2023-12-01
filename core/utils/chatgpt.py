@@ -1,5 +1,6 @@
 import asyncio
 import aiohttp
+import datetime
 import os
 import json
 from dotenv import load_dotenv, find_dotenv
@@ -88,7 +89,7 @@ def diag_formating(diag: dict):
     
     return params
 
-async def get_course_plan(diag: dict):
+async def get_course_plan(diag: dict, tg_id):
     url = "https://api.openai.com/v1/chat/completions"
     headers = {
         "Authorization": f'Bearer {os.getenv("GPT")}',
@@ -103,12 +104,28 @@ async def get_course_plan(diag: dict):
     timeout = aiohttp.ClientTimeout(total=600)
     async with aiohttp.ClientSession(timeout=timeout) as session:
         # try:
+        exc = None
+        n=3
+        while n>0:
             resp= await session.post(url, headers=headers, data=json.dumps(data))
             
-            gpt_resp = await resp.json()
-            
-            gpt_txt = gpt_resp["choices"][0]["message"]["content"]
-            return gpt_txt
+            try:
+                gpt_resp = await resp.json()
+                gpt_txt = gpt_resp["choices"][0]["message"]["content"]
+                if gpt_txt:
+                    test_obj = json.loads(gpt_txt)
+                    for i in range(21):
+                        test_obj["data"][i]
+                    break
+            except Exception as e:
+                exc =e
+                n-=1
+            await asyncio.sleep(1)
+        if n==0:
+            with open("Logs.txt", "a", encoding = "utf-8") as f:
+                time  =datetime.datetime.utcnow()
+                f.write(f"{time}:  {tg_id} - Ошибка чатгпт -- [{exc}]\n")
+        return gpt_txt
         # except:
         #     return "Что-то пошло не так во время генерации"
         # except:
@@ -128,7 +145,7 @@ async def get_course_plan(diag: dict):
 
 
 
-async def get_lecture_gpt(lesson: str, diag:dict ):
+async def get_lecture_gpt(lesson: str, diag:dict, tg_id ):
     url = "https://api.openai.com/v1/chat/completions"
     headers = {
         "Authorization": f'Bearer {os.getenv("GPT")}',
@@ -143,19 +160,38 @@ async def get_lecture_gpt(lesson: str, diag:dict ):
 
     timeout = aiohttp.ClientTimeout(total=600)
     async with aiohttp.ClientSession(timeout=timeout) as session:
-        # try:
+        exc = None
+        n=3
+        while n>0:
             resp= await session.post(url, headers=headers, data=json.dumps(data))
             
-            gpt_resp = await resp.json()
+            try:
+                gpt_resp = await resp.json()
+                gpt_txt = gpt_resp["choices"][0]["message"]["content"]
+                if gpt_txt:
+                    break
+            except Exception as e:
+                exc =e
+                n-=1
+            await asyncio.sleep(1)
+        if n==0:
+            with open("Logs.txt", "a", encoding = "utf-8") as f:
+                time  =datetime.datetime.utcnow()
+                f.write(f"{time}:  {tg_id} - Ошибка чатгпт -- [{exc}]\n")
+        return gpt_txt
+        # # try:
+        #     resp= await session.post(url, headers=headers, data=json.dumps(data))
             
-            gpt_txt = gpt_resp["choices"][0]["message"]["content"]
-            return gpt_txt
-        # except:
-        #     return "Что-то пошло не так во время генерации"
+        #     gpt_resp = await resp.json()
+            
+        #     gpt_txt = gpt_resp["choices"][0]["message"]["content"]
+        #     return gpt_txt
+        # # except:
+        # #     return "Что-то пошло не так во время генерации"
 
 
 
-async def get_frameworks_gpt(lesson: str, diag: dict):
+async def get_frameworks_gpt(lesson: str, diag: dict, tg_id):
     url = "https://api.openai.com/v1/chat/completions"
     headers = {
         "Authorization": f'Bearer {os.getenv("GPT")}',
@@ -169,20 +205,39 @@ async def get_frameworks_gpt(lesson: str, diag: dict):
 
     timeout = aiohttp.ClientTimeout(total=600)
     async with aiohttp.ClientSession(timeout=timeout) as session:
-        # try:
-        # try:
+        exc = None
+        n=3
+        while n>0:
             resp= await session.post(url, headers=headers, data=json.dumps(data))
             
-            gpt_resp = await resp.json()
+            try:
+                gpt_resp = await resp.json()
+                gpt_txt = gpt_resp["choices"][0]["message"]["content"]
+                if gpt_txt:
+                    break
+            except Exception as e:
+                exc =e
+                n-=1
+            await asyncio.sleep(1)
+        if n==0:
+            with open("Logs.txt", "a", encoding = "utf-8") as f:
+                time  =datetime.datetime.utcnow()
+                f.write(f"{time}:  {tg_id} - Ошибка чатгпт -- [{exc}]\n")
+        return gpt_txt
+        # # try:
+        # # try:
+        #     resp= await session.post(url, headers=headers, data=json.dumps(data))
             
-            gpt_txt = gpt_resp["choices"][0]["message"]["content"]
-            return gpt_txt
-        # except:
-        #     return "Что-то пошло не так во время генерации"
+        #     gpt_resp = await resp.json()
+            
+        #     gpt_txt = gpt_resp["choices"][0]["message"]["content"]
+        #     return gpt_txt
+        # # except:
+        # #     return "Что-то пошло не так во время генерации"
 
 
 
-async def get_feedback_gpt(context: str, question: str):
+async def get_feedback_gpt(context: str, question: str, tg_id):
     url = "https://api.openai.com/v1/chat/completions"
     headers = {
         "Authorization": f'Bearer {os.getenv("GPT")}',
@@ -196,20 +251,39 @@ async def get_feedback_gpt(context: str, question: str):
 
     timeout = aiohttp.ClientTimeout(total=600)
     async with aiohttp.ClientSession(timeout=timeout) as session:
-        # try:
+        exc = None
+        n=3
+        while n>0:
             resp= await session.post(url, headers=headers, data=json.dumps(data))
             
-            gpt_resp = await resp.json()
+            try:
+                gpt_resp = await resp.json()
+                gpt_txt = gpt_resp["choices"][0]["message"]["content"]
+                if gpt_txt:
+                    break
+            except Exception as e:
+                exc =e
+                n-=1
+            await asyncio.sleep(1)
+        if n==0:
+            with open("Logs.txt", "a", encoding = "utf-8") as f:
+                time  =datetime.datetime.utcnow()
+                f.write(f"{time}:  {tg_id} - Ошибка чатгпт -- [{exc}]\n")
+        return gpt_txt
+        # # try:
+        #     resp= await session.post(url, headers=headers, data=json.dumps(data))
             
-            gpt_txt = gpt_resp["choices"][0]["message"]["content"]
-            return gpt_txt
-        # except:
-        #     return "Что-то пошло не так во время генерации"
+        #     gpt_resp = await resp.json()
+            
+        #     gpt_txt = gpt_resp["choices"][0]["message"]["content"]
+        #     return gpt_txt
+        # # except:
+        # #     return "Что-то пошло не так во время генерации"
 
 
 
 
-async def get_advices_gpt(lesson: str, diag: dict):
+async def get_advices_gpt(lesson: str, diag: dict, tg_id):
     url = "https://api.openai.com/v1/chat/completions"
     headers = {
         "Authorization": f'Bearer {os.getenv("GPT")}',
@@ -223,18 +297,37 @@ async def get_advices_gpt(lesson: str, diag: dict):
 
     timeout = aiohttp.ClientTimeout(total=600)
     async with aiohttp.ClientSession(timeout=timeout) as session:
-        # try:
+        exc = None
+        n=3
+        while n>0:
             resp= await session.post(url, headers=headers, data=json.dumps(data))
             
-            gpt_resp = await resp.json()
+            try:
+                gpt_resp = await resp.json()
+                gpt_txt = gpt_resp["choices"][0]["message"]["content"]
+                if gpt_txt:
+                    break
+            except Exception as e:
+                exc =e
+                n-=1
+            await asyncio.sleep(1)
+        if n==0:
+            with open("Logs.txt", "a", encoding = "utf-8") as f:
+                time  =datetime.datetime.utcnow()
+                f.write(f"{time}:  {tg_id} - Ошибка чатгпт -- [{exc}]\n")
+        return gpt_txt
+        # # try:
+        #     resp= await session.post(url, headers=headers, data=json.dumps(data))
             
-            gpt_txt = gpt_resp["choices"][0]["message"]["content"]
-            return gpt_txt
-        # except:
-            # return "Что-то пошло не так во время генерации"
+        #     gpt_resp = await resp.json()
+            
+        #     gpt_txt = gpt_resp["choices"][0]["message"]["content"]
+        #     return gpt_txt
+        # # except:
+        #     # return "Что-то пошло не так во время генерации"
 
 
-async def get_exercises_gpt(lesson: str, diag: dict):
+async def get_exercises_gpt(lesson: str, diag: dict, tg_id):
     url = "https://api.openai.com/v1/chat/completions"
     headers = {
         "Authorization": f'Bearer {os.getenv("GPT")}',
@@ -248,17 +341,36 @@ async def get_exercises_gpt(lesson: str, diag: dict):
 
     timeout = aiohttp.ClientTimeout(total=600)
     async with aiohttp.ClientSession(timeout=timeout) as session:
-        # try:
+        exc = None
+        n=3
+        while n>0:
             resp= await session.post(url, headers=headers, data=json.dumps(data))
             
-            gpt_resp = await resp.json()
+            try:
+                gpt_resp = await resp.json()
+                gpt_txt = gpt_resp["choices"][0]["message"]["content"]
+                if gpt_txt:
+                    break
+            except Exception as e:
+                exc =e
+                n-=1
+            await asyncio.sleep(1)
+        if n==0:
+            with open("Logs.txt", "a", encoding = "utf-8") as f:
+                time  =datetime.datetime.utcnow()
+                f.write(f"{time}:  {tg_id} - Ошибка чатгпт -- [{exc}]\n")
+        return gpt_txt
+        # # try:
+        #     resp= await session.post(url, headers=headers, data=json.dumps(data))
             
-            gpt_txt = gpt_resp["choices"][0]["message"]["content"]
-            return gpt_txt
-        # except:
-        #     return "Что-то пошло не так во время генерации"
+        #     gpt_resp = await resp.json()
+            
+        #     gpt_txt = gpt_resp["choices"][0]["message"]["content"]
+        #     return gpt_txt
+        # # except:
+        # #     return "Что-то пошло не так во время генерации"
 
-async def get_reflex_gpt(lesson: str, diag: dict):
+async def get_reflex_gpt(lesson: str, diag: dict, tg_id):
     url = "https://api.openai.com/v1/chat/completions"
     headers = {
         "Authorization": f'Bearer {os.getenv("GPT")}',
@@ -272,12 +384,31 @@ async def get_reflex_gpt(lesson: str, diag: dict):
 
     timeout = aiohttp.ClientTimeout(total=600)
     async with aiohttp.ClientSession(timeout=timeout) as session:
-        # try:
+        exc = None
+        n=3
+        while n>0:
             resp= await session.post(url, headers=headers, data=json.dumps(data))
             
-            gpt_resp = await resp.json()
+            try:
+                gpt_resp = await resp.json()
+                gpt_txt = gpt_resp["choices"][0]["message"]["content"]
+                if gpt_txt:
+                    break
+            except Exception as e:
+                exc =e
+                n-=1
+            await asyncio.sleep(1)
+        if n==0:
+            with open("Logs.txt", "a", encoding = "utf-8") as f:
+                time  =datetime.datetime.utcnow()
+                f.write(f"{time}:  {tg_id} - Ошибка чатгпт -- [{exc}]\n")
+        return gpt_txt
+        # # try:
+        #     resp= await session.post(url, headers=headers, data=json.dumps(data))
             
-            gpt_txt = gpt_resp["choices"][0]["message"]["content"]
-            return gpt_txt
-        # except:
-        #     return "Что-то пошло не так во время генерации"
+        #     gpt_resp = await resp.json()
+            
+        #     gpt_txt = gpt_resp["choices"][0]["message"]["content"]
+        #     return gpt_txt
+        # # except:
+        # #     return "Что-то пошло не так во время генерации"
