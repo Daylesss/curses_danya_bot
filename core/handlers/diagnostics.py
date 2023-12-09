@@ -7,6 +7,7 @@ from core.utils.fsm import DiagFSM, CourseFSM
 from core.keyboards import inline
 from core.utils.chatgpt import get_course_plan
 from core.utils.database import db
+import datetime
 diag_router = Router(name="diag")
 
 @diag_router.callback_query(F.data == "К диагностике")
@@ -182,9 +183,10 @@ async def confirm_diag(callback: types.CallbackQuery, state: FSMContext):
             db.insert_plan(db.get_user_id(callback.from_user.id), diag_data, plan)
             db.set_course(db.get_plan_id(db.get_user_id(callback.from_user.id)))
             plan_str = plan_formating(db.get_user_id(callback.from_user.id))
-        except:
+        except Exception as ex:
             with open("Logs.txt", "a", encoding = "utf-8") as f:
-                f.write(f"{callback.from_user.id} ({callback.from_user.username}) Нет плана!!!!!\n")
+                time =datetime.datetime.utcnow()
+                f.write(f"{time}:  {callback.from_user.id} ({callback.from_user.username}) НЕТ ПЛАНА!!! - [{ex}]\n")
             await callback.message.answer("Не удалось сгенерировать план под вашу диагностику, пройдите диагностику занаво, нажав /new или напишите в поддержку /support")
             await state.clear()
             return
